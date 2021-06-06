@@ -70,6 +70,11 @@ in {
         hostName = "laborfactory";
         ipAddress = "10.77.1.120";
       }
+      {
+        ethernetAddress = "d4:ae:52:98:bc:3c"; # Note that this is the 1st nic
+        hostName = "cardinal";
+        ipAddress = "10.77.1.121";
+      }
     ];
     extraConfig = ''
       option domain-name-servers 1.1.1.1, 8.8.8.8, 8.8.4.4;
