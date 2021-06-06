@@ -61,8 +61,8 @@ in {
         ipAddress = "10.77.1.118";
       }
       {
-        ethernetAddress = "34:17:Eb:99:E0:36";
-        hostName = "hobbit1";
+        ethernetAddress = "38:2c:4a:71:bf:cb";
+        hostName = "hobbit2";
         ipAddress = "10.77.1.119";
       }
       {
