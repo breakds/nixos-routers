@@ -107,6 +107,7 @@ in {
     trustedInterfaces = [ vlanLocal ];
     # Do not perform reverse path filter test on a packet.
     checkReversePath = false;
+    allowedTCPPorts = [ 80 443 8444 2122 ];
   };
 
   # NAT
