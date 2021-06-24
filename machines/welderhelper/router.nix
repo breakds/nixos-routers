@@ -11,7 +11,7 @@ let cfg = {
 
 in {
   networking.networkmanager.enable = lib.mkForce false;
-  networking.nameservers = [ "8.8.8.8" ];
+  networking.nameservers = [ "8.8.8.8" "1.1.1.1" ];
   networking.enableIPv6 = lib.mkForce false;  
   
   # Enable Kernel IP Forwarding.
