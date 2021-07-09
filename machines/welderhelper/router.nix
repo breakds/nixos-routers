@@ -12,8 +12,8 @@ let cfg = {
 in {
   networking.networkmanager.enable = lib.mkForce false;
   networking.nameservers = [ "8.8.8.8" "1.1.1.1" ];
-  networking.enableIPv6 = lib.mkForce false;  
-  
+  networking.enableIPv6 = lib.mkForce false;
+
   # Enable Kernel IP Forwarding.
   #
   # For more details, refer to
@@ -21,7 +21,7 @@ in {
   boot.kernel.sysctl = {
     "net.ipv4.conf.all.forwarding" = true;
     "net.ipv4.conf.default.forwarding" = true;
-    # TODO(breakds): Enable this for ipv6 
+    # TODO(breakds): Enable this for ipv6
     # "net.ipv6.conf.all.forwarding" = true;
     # "net.ipv6.conf.default.forwarding" = true;
   };
@@ -82,7 +82,7 @@ in {
 
       default-lease-time 25920000;
       max-lease-time 25920000;
-      
+
       subnet 10.77.1.0 netmask 255.255.255.0 {
         interface ${vlanLocal};
         range 10.77.1.20 10.77.1.240;
@@ -120,6 +120,8 @@ in {
       { sourcePort = 22; destination = "10.77.1.117:22"; loopbackIPs = [ "23.119.127.221" ]; }
       { sourcePort = 80; destination = "10.77.1.117:80"; loopbackIPs = [ "23.119.127.221" ]; }
       { sourcePort = 443; destination = "10.77.1.117:443"; loopbackIPs = [ "23.119.127.221" ]; }
+      # Temporary, for Jupyter
+      { sourcePort = 7777; destination = "10.77.1.117:7777"; loopbackIPs = [ "23.119.127.221" ]; }
       # For Chia. Let hardstone handle it.
       { sourcePort = 8444; destination = "10.77.1.118:8444"; loopbackIPs = [ "23.119.127.221" ]; }
       { sourcePort = 2122; destination = "10.77.1.121:22"; loopbackIPs = [ "23.119.127.221" ]; }
@@ -133,7 +135,7 @@ in {
   #  +-----+-----+-----+
   #  |  A  |  B  |  C  | <- managed switch
   #  |     |     |     |
-  #  +--|--+--|--+--|--+  
+  #  +--|--+--|--+--|--+
   #     |     |     +------------------ Wifi AP/Devices
   #     |     |
   #     |     +------------ Modem
