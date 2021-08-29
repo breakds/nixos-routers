@@ -72,7 +72,7 @@ in {
       }
       {
         ethernetAddress = "d4:ae:52:98:bc:3c"; # Note that this is the 1st nic
-        hostName = "cardinal";
+        hostName = "richelieu";
         ipAddress = "10.77.1.121";
       }
     ];
