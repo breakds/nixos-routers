@@ -66,14 +66,14 @@ in {
         ipAddress = "10.77.1.119";
       }
       {
-        ethernetAddress = "E8:6F:38:46:E3:B5";
-        hostName = "laborfactory";
-        ipAddress = "10.77.1.120";
-      }
-      {
         ethernetAddress = "d4:ae:52:98:bc:3c"; # Note that this is the 1st nic
         hostName = "richelieu";
         ipAddress = "10.77.1.121";
+      }
+      {
+        ethernetAddress = "00:25:90:99:89:04"; # Note that this is the 1st nic
+        hostName = "behemoth";
+        ipAddress = "10.77.1.125";
       }
     ];
     extraConfig = ''
