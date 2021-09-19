@@ -66,6 +66,11 @@ in {
         ipAddress = "10.77.1.119";
       }
       {
+        ethernetAddress = "24:b6:fd:f6:25:a4"; # iDrac of richelieu
+        hostName = "idracJHVPDV1";
+        ipAddress = "10.77.1.120";
+      }
+      {
         ethernetAddress = "d4:ae:52:98:bc:3c"; # Note that this is the 1st nic
         hostName = "richelieu";
         ipAddress = "10.77.1.121";
