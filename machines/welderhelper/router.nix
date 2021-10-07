@@ -80,6 +80,16 @@ in {
         hostName = "behemoth";
         ipAddress = "10.77.1.125";
       }
+      {
+        ethernetAddress = "FC:34:97:A5:CB:C2";  # Ethernet Port 0, the lower one
+        hostName = "lothric";
+        ipAddress = "10.77.1.127";
+      }
+      # {
+      #   ethernetAddress = "d4:ae:52:98:bc:3c";  # Ethernet Port 0, the lower one
+      #   hostName = "lorian";
+      #   ipAddress = "10.77.1.123";
+      # }
     ];
     extraConfig = ''
       option domain-name-servers 1.1.1.1, 8.8.8.8, 8.8.4.4;
