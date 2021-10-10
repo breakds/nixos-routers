@@ -85,11 +85,11 @@ in {
         hostName = "lothric";
         ipAddress = "10.77.1.127";
       }
-      # {
-      #   ethernetAddress = "d4:ae:52:98:bc:3c";  # Ethernet Port 0, the lower one
-      #   hostName = "lorian";
-      #   ipAddress = "10.77.1.123";
-      # }
+      {
+        ethernetAddress = "FC:34:97:A5:CF:55";  # Ethernet Port 0, the lower one
+        hostName = "lorian";
+        ipAddress = "10.77.1.128";
+      }
     ];
     extraConfig = ''
       option domain-name-servers 1.1.1.1, 8.8.8.8, 8.8.4.4;
