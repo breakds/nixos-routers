@@ -51,7 +51,7 @@ in {
     interfaces = [ vlanLocal ];
     machines = [
       {
-        ethernetAddress = "A8:A1:59:28:1D:B5";
+        ethernetAddress = "7C:10:C9:3C:52:B9";
         hostName = "gilgamesh";
         ipAddress = "10.77.1.117";
       }
