@@ -56,16 +56,6 @@ in {
         ipAddress = "10.77.1.117";
       }
       {
-        ethernetAddress = "B4:2E:99:31:7D:95";
-        hostName = "hardstone";
-        ipAddress = "10.77.1.118";
-      }
-      {
-        ethernetAddress = "38:2c:4a:71:bf:cb";
-        hostName = "hobbit2";
-        ipAddress = "10.77.1.119";
-      }
-      {
         ethernetAddress = "24:b6:fd:f6:25:a4"; # iDrac of richelieu
         hostName = "idracJHVPDV1";
         ipAddress = "10.77.1.120";
@@ -76,11 +66,6 @@ in {
         ipAddress = "10.77.1.121";
       }
       {
-        ethernetAddress = "00:25:90:99:89:04"; # Note that this is the 1st nic
-        hostName = "behemoth";
-        ipAddress = "10.77.1.125";
-      }
-      {
         ethernetAddress = "FC:34:97:A5:CB:C2";  # Ethernet Port 0, the lower one
         hostName = "lothric";
         ipAddress = "10.77.1.127";
@@ -89,6 +74,11 @@ in {
         ethernetAddress = "FC:34:97:A5:CF:55";  # Ethernet Port 0, the lower one
         hostName = "lorian";
         ipAddress = "10.77.1.128";
+      }
+      {
+        ethernetAddress = "DC:71:96:98:95:EF";  # The WiFi
+        hostName = "zero";
+        ipAddress = "10.77.1.221";
       }
     ];
     extraConfig = ''
