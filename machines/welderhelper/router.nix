@@ -80,6 +80,11 @@ in {
         hostName = "zero";
         ipAddress = "10.77.1.221";
       }
+      {
+        ethernetAddress = "a8:a1:59:3a:9e:5a";
+        hostName = "samaritan";
+        ipAddress = "10.77.1.185";
+      }
     ];
     extraConfig = ''
       option domain-name-servers 1.1.1.1, 8.8.8.8, 8.8.4.4;
