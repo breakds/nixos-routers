@@ -17,7 +17,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    gparted pass smbclient
+    gparted pass samba
   ] ++ lib.optionals config.vital.graphical.enable [
     feh
     jq
