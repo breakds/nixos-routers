@@ -12,8 +12,8 @@ let cfg = {
 in {
   networking.networkmanager.enable = lib.mkForce false;
   networking.nameservers = [ "8.8.8.8" "1.1.1.1" ];
-  networking.enableIPv6 = lib.mkForce false;  
-  
+  networking.enableIPv6 = lib.mkForce true;
+
   # Enable Kernel IP Forwarding.
   #
   # For more details, refer to
@@ -21,11 +21,9 @@ in {
   boot.kernel.sysctl = {
     "net.ipv4.conf.all.forwarding" = true;
     "net.ipv4.conf.default.forwarding" = true;
-    # TODO(breakds): Enable this for ipv6 
-    # "net.ipv6.conf.all.forwarding" = true;
-    # "net.ipv6.conf.default.forwarding" = true;
+    "net.ipv6.conf.all.forwarding" = true;
+    "net.ipv6.conf.default.forwarding" = true;
   };
-
 
   # Create 2 separate VLAN devices for the NIC (e.g. eno1). One of the
   # VLAN device will be used for the uplink, and the other one will be
@@ -92,7 +90,7 @@ in {
 
       default-lease-time 25920000;
       max-lease-time 25920000;
-      
+
       subnet 10.77.1.0 netmask 255.255.255.0 {
         interface ${vlanLocal};
         range 10.77.1.20 10.77.1.240;
@@ -123,6 +121,7 @@ in {
   # NAT
   networking.nat = {
     enable = true;
+    enableIPv6 = true;
     externalInterface = vlanUplink;
     internalInterfaces = [ vlanLocal ];
     internalIPs = [ "10.77.1.0/24" ];
@@ -140,7 +139,7 @@ in {
   #  +-----+-----+-----+
   #  |  A  |  B  |  C  | <- managed switch
   #  |     |     |     |
-  #  +--|--+--|--+--|--+  
+  #  +--|--+--|--+--|--+
   #     |     |     +------------------ Wifi AP/Devices
   #     |     |
   #     |     +------------ Modem
