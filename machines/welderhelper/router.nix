@@ -17,7 +17,9 @@ in {
     "2606:4700:4700::1111"  # Cloudflare IPv6 one.one.one.one
     "2606:4700:4700::1001"  # Cloudflare IPv6 one.one.one.one
   ];
-  networking.enableIPv6 = true;
+
+  # TODO(breakds): If this is enabled, the router does not work correctly.
+  networking.enableIPv6 = false;
 
   # Enable Kernel IP Forwarding.
   #
