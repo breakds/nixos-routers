@@ -17,7 +17,7 @@ in {
     "2606:4700:4700::1111"  # Cloudflare IPv6 one.one.one.one
     "2606:4700:4700::1001"  # Cloudflare IPv6 one.one.one.one
   ];
-  networking.enableIPv6 = lib.mkForce true;
+  networking.enableIPv6 = true;
 
   # Enable Kernel IP Forwarding.
   #
@@ -26,14 +26,15 @@ in {
   boot.kernel.sysctl = {
     "net.ipv4.conf.all.forwarding" = true;
     "net.ipv4.conf.default.forwarding" = true;
-    "net.ipv6.conf.all.forwarding" = true;
-    "net.ipv6.conf.default.forwarding" = true;
+    "net.ipv6.conf.all.forwarding" = false;
+    "net.ipv6.conf.default.forwarding" = false;
   };
 
   # Create 2 separate VLAN devices for the NIC (e.g. eno1). One of the
   # VLAN device will be used for the uplink, and the other one will be
   # used for the internal network.
-
+  #
+  # TODO(breakds): Have more vlans in the future when needed.
   networking.vlans = {
     # uplink
     "${vlanUplink}" = {
@@ -126,7 +127,7 @@ in {
   # NAT
   networking.nat = {
     enable = true;
-    enableIPv6 = true;
+    enableIPv6 = false;
     externalInterface = vlanUplink;
     internalInterfaces = [ vlanLocal ];
     internalIPs = [ "10.77.1.0/24" ];
