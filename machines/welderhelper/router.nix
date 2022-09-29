@@ -11,7 +11,12 @@ let cfg = {
 
 in {
   networking.networkmanager.enable = lib.mkForce false;
-  networking.nameservers = [ "8.8.8.8" "1.1.1.1" ];
+  networking.nameservers = [
+    "8.8.8.8"  # Google
+    "1.1.1.1"  # Cloudflare
+    "2606:4700:4700::1111"  # Cloudflare IPv6 one.one.one.one
+    "2606:4700:4700::1001"  # Cloudflare IPv6 one.one.one.one
+  ];
   networking.enableIPv6 = lib.mkForce true;
 
   # Enable Kernel IP Forwarding.
