@@ -28,8 +28,8 @@ in {
   boot.kernel.sysctl = {
     "net.ipv4.conf.all.forwarding" = true;
     "net.ipv4.conf.default.forwarding" = true;
-    "net.ipv6.conf.all.forwarding" = false;
-    "net.ipv6.conf.default.forwarding" = false;
+    "net.ipv6.conf.all.forwarding" = true;
+    "net.ipv6.conf.default.forwarding" = true;
   };
 
   # Create 2 separate VLAN devices for the NIC (e.g. eno1). One of the
