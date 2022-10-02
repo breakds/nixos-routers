@@ -160,7 +160,11 @@ in {
   # 2. B as an Access (Untagged) Port with Vlan ID (and PVID) = 60
   # 3. C as an Access (Untagged) Port with Vlan ID (and PVID) = 90
   networking.interfaces."${cfg.nic}".useDHCP = false;
-  # Let the modem "DHCP me" for the uplink VLAN.
+
+  # Let the modem "DHCP me" for the uplink VLAN. The modem is set to
+  # IP Passthrough mode (for ATT, it is DHCPS-fixed more
+  # specifically). This will pass the modem's public IP to the Uplink
+  # (WAN) interface.
   networking.interfaces."${vlanUplink}".useDHCP = true;
   networking.interfaces."${vlanLocal}" = {
     # This is going to be the router's IP to internal devices connects
