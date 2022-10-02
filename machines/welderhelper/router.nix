@@ -166,6 +166,56 @@ in {
   # specifically). This will pass the modem's public IP to the Uplink
   # (WAN) interface.
   networking.interfaces."${vlanUplink}".useDHCP = true;
+  # Now we need to make more specific configuration to the DHCP client
+  # than handles the Uplink (WAN) interface because of IPv6. Credit to
+  # KJ and Francis Begyn
+  # (https://francis.begyn.be/blog/ipv6-nixos-router).
+  #
+  # The main purpose here is to assign a IPv6 prefix to the LAN
+  # interface(s), so that together with a router advertisement service
+  # it can provide automatic IPv6 address configuration for the
+  # internal network.
+
+  # TODO(breakds): Enable this after learning about the nftables.
+  # networking.dhcpcd = {
+  #   enable = true;
+
+  #   # Do not de-configure the interface and configurations when it
+  #   # exists. I probably do not need persistent based on my
+  #   # understanding, but I'll just keep it on.
+  #   persistent = true;
+  #   allowInterfaces = [ vlanUplink ];
+
+  #   # This basically configure it to assign IPv6 prefixes to the other
+  #   # (LAN) interfaces.
+  #   extraConfig = ''
+  #     # Don't touch our DNS settings
+  #     nohook resolv.conf
+
+  #     # Generate a RFC 4361 complient DHCP ID. This unique identifier
+  #     # plus the IAID (see below) will be used as client ID.
+  #     duid
+
+  #     # The hardware address (i.e. MAC) address will be disguised by a
+  #     # generated RFC7217 address, so that the actual MAC is not exposed
+  #     # to the internet.
+  #     slaac private
+
+  #     # Do not solicit or accept IPv6 Router Advertisement.
+  #     noipv6rs
+  #     # Only IPv6 is handled here. IPv4 is handled by dhcpd4.
+  #     ipv6only
+
+  #     interface ${vlanUplink}
+  #       # IPv6 router advertisement
+  #       ipv6rs
+  #       # Associate the IAID
+  #       iaid 1
+  #       # Request a Delegated Prefix and assign to LAN interface
+  #       ia_pd 1 ${vlanLocal}
+  #   '';
+  # };
+
   networking.interfaces."${vlanLocal}" = {
     # This is going to be the router's IP to internal devices connects
     # to it.
