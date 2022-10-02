@@ -19,7 +19,7 @@ in {
   ];
 
   # TODO(breakds): If this is enabled, the router does not work correctly.
-  networking.enableIPv6 = false;
+  networking.enableIPv6 = true;
 
   # Enable Kernel IP Forwarding.
   #
