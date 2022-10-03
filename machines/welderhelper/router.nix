@@ -208,9 +208,9 @@ in {
         # IPv6 router advertisement
         ipv6rs
         # Associate the IAID
-        iaid 1
+        iaid 0
         # Request a Delegated Prefix and assign to LAN interface
-        ia_pd 1 ${vlanLocal}
+        ia_pd 0//56 ${vlanLocal}.100/2/64
     '';
   };
 
