@@ -177,44 +177,42 @@ in {
   # internal network.
 
   # TODO(breakds): Enable this after learning about the nftables.
-  # networking.dhcpcd = {
-  #   enable = true;
+  networking.dhcpcd = {
+    enable = true;
 
-  #   # Do not de-configure the interface and configurations when it
-  #   # exists. I probably do not need persistent based on my
-  #   # understanding, but I'll just keep it on.
-  #   persistent = true;
-  #   allowInterfaces = [ vlanUplink ];
+    # Do not de-configure the interface and configurations when it
+    # exists. I probably do not need persistent based on my
+    # understanding, but I'll just keep it on.
+    persistent = true;
+    allowInterfaces = [ vlanUplink ];
 
-  #   # This basically configure it to assign IPv6 prefixes to the other
-  #   # (LAN) interfaces.
-  #   extraConfig = ''
-  #     # Don't touch our DNS settings
-  #     nohook resolv.conf
+    # This basically configure it to assign IPv6 prefixes to the other
+    # (LAN) interfaces.
+    extraConfig = ''
+      # Don't touch our DNS settings
+      nohook resolv.conf
 
-  #     # Generate a RFC 4361 complient DHCP ID. This unique identifier
-  #     # plus the IAID (see below) will be used as client ID.
-  #     duid
+      # Generate a RFC 4361 complient DHCP ID. This unique identifier
+      # plus the IAID (see below) will be used as client ID.
+      duid
 
-  #     # The hardware address (i.e. MAC) address will be disguised by a
-  #     # generated RFC7217 address, so that the actual MAC is not exposed
-  #     # to the internet.
-  #     slaac private
+      # The hardware address (i.e. MAC) address will be disguised by a
+      # generated RFC7217 address, so that the actual MAC is not exposed
+      # to the internet.
+      slaac private
 
-  #     # Do not solicit or accept IPv6 Router Advertisement.
-  #     noipv6rs
-  #     # Only IPv6 is handled here. IPv4 is handled by dhcpd4.
-  #     ipv6only
+      # Do not solicit or accept IPv6 Router Advertisement.
+      noipv6rs
 
-  #     interface ${vlanUplink}
-  #       # IPv6 router advertisement
-  #       ipv6rs
-  #       # Associate the IAID
-  #       iaid 1
-  #       # Request a Delegated Prefix and assign to LAN interface
-  #       ia_pd 1 ${vlanLocal}
-  #   '';
-  # };
+      interface ${vlanUplink}
+        # IPv6 router advertisement
+        ipv6rs
+        # Associate the IAID
+        iaid 1
+        # Request a Delegated Prefix and assign to LAN interface
+        ia_pd 1 ${vlanLocal}
+    '';
+  };
 
   networking.interfaces."${vlanLocal}" = {
     # This is going to be the router's IP to internal devices connects
