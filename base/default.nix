@@ -16,6 +16,8 @@
     };
   };
 
+  vital.programs.modern-utils.enable = true;
+
   environment.systemPackages = with pkgs; [
     gparted pass samba emacs
   ] ++ lib.optionals config.vital.graphical.enable [
