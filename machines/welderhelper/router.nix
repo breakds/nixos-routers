@@ -214,6 +214,29 @@ in {
     '';
   };
 
+  services.corerad = {
+    enable = true;
+    settings = {
+      debug = {
+        address = "localhost:9430";
+        prometheus = true;              # enable prometheus metrics
+      };
+      interfaces = [
+        {
+          name = vlanUplink;
+          monitor = false;              # see the remark below
+        }
+        {
+          name = vlanLocal;
+          advertise = true;
+          prefix = [
+            { prefix = "::/64"; }
+          ];
+        }
+      ];
+    };
+  };
+
   networking.interfaces."${vlanLocal}" = {
     # This is going to be the router's IP to internal devices connects
     # to it.
