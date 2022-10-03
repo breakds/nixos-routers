@@ -17,7 +17,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    gparted pass samba
+    gparted pass samba emacs
   ] ++ lib.optionals config.vital.graphical.enable [
     feh
     jq
