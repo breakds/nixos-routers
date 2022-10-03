@@ -215,7 +215,8 @@ in {
   };
 
   services.corerad = {
-    enable = true;
+    # TODO(breakds): Enable this
+    enable = false;
     settings = {
       debug = {
         address = "localhost:9430";
