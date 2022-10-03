@@ -226,6 +226,10 @@ in {
     useDHCP = false;
   };
 
+  # +------------------+
+  # | Applications     |
+  # +------------------+
+
   # iperf3 Server for speed/bandwidth testing
   services.iperf3 = {
     enable = true;
@@ -236,4 +240,13 @@ in {
   environment.systemPackages = with pkgs; [
     tcpdump ethtool
   ];
+
+  # Avahi for local Multicast DNS
+  services.avahi = {
+    enable = true;
+    reflector = true;
+    interfaces = [
+      vlanLocal
+    ];
+  };
 }
