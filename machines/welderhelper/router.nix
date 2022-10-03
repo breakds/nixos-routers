@@ -210,13 +210,13 @@ in {
         # Associate the IAID
         iaid 0
         # Request a Delegated Prefix and assign to LAN interface
-        ia_pd 0//64 ${vlanLocal}/1/72
+        ia_pd 0//64 ${vlanLocal}//64
     '';
   };
 
   services.corerad = {
     # TODO(breakds): Enable this
-    enable = true;
+    enable = false;
     settings = {
       debug = {
         address = "localhost:9430";
