@@ -170,10 +170,10 @@ in {
   # KJ and Francis Begyn
   # (https://francis.begyn.be/blog/ipv6-nixos-router).
   #
-  # The main purpose here is to assign a IPv6 prefix to the LAN
-  # interface(s), so that together with a router advertisement service
-  # it can provide automatic IPv6 address configuration for the
-  # internal network.
+  # The main purpose here is to assign a IPv6 prefix delegation to the
+  # LAN interface(s), so that together with a router advertisement
+  # service it can provide automatic IPv6 address configuration for
+  # the internal network.
 
   networking.dhcpcd = {
     enable = true;
@@ -184,8 +184,6 @@ in {
     persistent = true;
     allowInterfaces = [ vlanUplink ];
 
-    # This basically configure it to assign IPv6 prefixes to the other
-    # (LAN) interfaces.
     extraConfig = ''
       # Don't touch our DNS settings
       nohook resolv.conf
