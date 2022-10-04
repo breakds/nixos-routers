@@ -27,8 +27,10 @@ in {
   boot.kernel.sysctl = {
     "net.ipv4.conf.all.forwarding" = true;
     "net.ipv4.conf.default.forwarding" = true;
-    "net.ipv6.conf.all.forwarding" = true;
-    "net.ipv6.conf.default.forwarding" = true;
+    # TODO(breakds): Enable this when I have a better way to protect
+    # ipv6 forwarding from visiting all devices internally.
+    "net.ipv6.conf.all.forwarding" = false;
+    "net.ipv6.conf.default.forwarding" = false;
   };
 
   # Create 2 separate VLAN devices for the NIC (e.g. eno1). One of the
