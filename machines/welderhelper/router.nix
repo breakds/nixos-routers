@@ -205,12 +205,11 @@ in {
       noipv6rs
 
       interface ${vlanUplink}
-        # IPv6 router advertisement
+        # Enable routing solicitation for Uplink (WAN)
         ipv6rs
-        # Associate the IAID
-        iaid 0
-        # Request a Delegated Prefix and assign to LAN interface
-        ia_pd 0//64 ${vlanLocal}//64
+        # Request an IPv6 address for iaid 1
+        ia_na 1
+        ia_pd 2/1/56 ${vlanLocal}/0/64
     '';
   };
 
