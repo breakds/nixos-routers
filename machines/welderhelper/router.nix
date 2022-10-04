@@ -209,7 +209,13 @@ in {
         ipv6rs
         # Request an IPv6 address for iaid 1
         ia_na 1
-        ia_pd 2/1/56 ${vlanLocal}/0/64
+	# Request an IPv6 Prefix Delegation (PD) for iaid 2
+	# The prefix length should be 56
+	# The PD is assigned to LAN, with prefix length = 64
+	# The suffix is set to 77 (Hex 4D)
+	# An example IPv6 PD to LAN will look like
+	# 3600:9200:7f7f:a66f::4d/64
+        ia_pd 2//56 ${vlanLocal}/0/64/77
     '';
   };
 
