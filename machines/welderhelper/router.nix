@@ -18,7 +18,6 @@ in {
     "2606:4700:4700::1001"  # Cloudflare IPv6 one.one.one.one
   ];
 
-  # TODO(breakds): If this is enabled, the router does not work correctly.
   networking.enableIPv6 = true;
 
   # Enable Kernel IP Forwarding.
@@ -176,7 +175,6 @@ in {
   # it can provide automatic IPv6 address configuration for the
   # internal network.
 
-  # TODO(breakds): Enable this after learning about the nftables.
   networking.dhcpcd = {
     enable = true;
 
@@ -220,8 +218,7 @@ in {
   };
 
   services.corerad = {
-    # TODO(breakds): Enable this
-    enable = false;
+    enable = true;
     settings = {
       debug = {
         address = "localhost:9430";
