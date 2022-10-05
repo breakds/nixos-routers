@@ -123,6 +123,10 @@ in {
     # Do not perform reverse path filter test on a packet.
     checkReversePath = false;
 
+    # The following is about preventing the outside packet from accessing
+    # internal servers via IPv6. This is done by asking the router to stop
+    # forwarding packets unless they are going outside or coming back w.t.r. an
+    # already established connection.
     extraCommands = ''
       ip6tables -P FORWARD DROP
       ip6tables -A FORWARD -i ${vlanLocal} -o ${vlanUplink} -j ACCEPT
