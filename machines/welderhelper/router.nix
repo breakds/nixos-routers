@@ -127,6 +127,10 @@ in {
 
     extraCommands = ''
       ip6tables -P FORWARD DROP
+      ip6tables -A FORWARD -i ${vlanLocal} -o ${vlanUplink} -j ACCEPT
+      ip6tables -A FORWARD -i lo -j ACCEPT
+      ip6tables -A FORWARD -o lo -j ACCEPT
+      ip6tables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
     '';
   };
 
