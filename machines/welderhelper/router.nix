@@ -124,6 +124,10 @@ in {
     trustedInterfaces = [ vlanLocal ];
     # Do not perform reverse path filter test on a packet.
     checkReversePath = false;
+
+    extraCommands = ''
+      ip6tables -P FORWARD DROP
+    '';
   };
 
   # NAT
