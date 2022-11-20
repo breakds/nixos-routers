@@ -86,6 +86,13 @@ in {
         ipAddress = "10.77.1.221";
       }
       {
+        # WiFi
+        ethernetAddress = "04:cf:4b:21:68:6c";
+        hostName = "hand";
+        ipAddress = "10.77.1.187";
+      }
+      # TODO(breakds): To be replaced by malenia
+      {
         ethernetAddress = "a8:a1:59:3a:9e:5a";
         hostName = "samaritan";
         ipAddress = "10.77.1.185";
