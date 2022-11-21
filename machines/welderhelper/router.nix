@@ -91,10 +91,9 @@ in {
         hostName = "hand";
         ipAddress = "10.77.1.187";
       }
-      # TODO(breakds): To be replaced by malenia
       {
-        ethernetAddress = "a8:a1:59:3a:9e:5a";
-        hostName = "samaritan";
+        ethernetAddress = "a0:36:bc:bb:4f:8e";
+        hostName = "malenia";
         ipAddress = "10.77.1.185";
       }
     ];
