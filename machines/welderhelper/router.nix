@@ -96,6 +96,11 @@ in {
         hostName = "malenia";
         ipAddress = "10.77.1.185";
       }
+      {
+        ethernetAddress = "dc:a6:32:8d:66:dd";
+        hostName = "armlet";
+        ipAddress = "10.77.1.188";
+      }
     ];
     extraConfig = ''
       option domain-name-servers 1.1.1.1, 8.8.8.8, 8.8.4.4;
