@@ -71,6 +71,11 @@ in {
         ipAddress = "10.77.1.121";
       }
       {
+        ethernetAddress = "fc:34:97:68:ef:35"; # eno1
+        hostName = "octavian";
+        ipAddress = "10.77.1.130";
+      }
+      {
         ethernetAddress = "FC:34:97:A5:CB:C2";  # Ethernet Port 0, the lower one
         hostName = "lothric";
         ipAddress = "10.77.1.127";
