@@ -2,7 +2,8 @@
   description = "Collection of my NixOS machines";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.05";
+    nixpkgs2205.url = "github:NixOS/nixpkgs/nixos-22.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.11";
 
     # Use vital-modules, with the same nixpkgs
     vital-modules.url = "github:nixvital/vital-modules";
@@ -13,12 +14,12 @@
     nixos-home.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, vital-modules, nixos-home, ... }: {
+  outputs = { self, nixpkgs, vital-modules, nixos-home, ... }@inputs: {
     nixosConfigurations = {
 
       # The router welderhelper is an Intel NUC with Intel i5-4250U
       # dual cores.
-      welderhelper = nixpkgs.lib.nixosSystem {
+      welderhelper = inputs.nixpkgs2205.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           vital-modules.nixosModules.foundation
