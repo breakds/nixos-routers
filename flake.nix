@@ -26,6 +26,17 @@
           ./machines/welderhelper
         ];
       };
+
+      # The router pyrechomper is a topton mini PC with Intel N5105
+      # quad cores.
+      pyrechomper = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          vital-modules.nixosModules.foundation
+          nixos-home.nixosModules.breakds-home
+          ./machines/pyrechomper
+        ];
+      };
     };
   };
 }
