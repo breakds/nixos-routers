@@ -26,5 +26,6 @@
     google-chrome
     scrot
     emacs
+    git
   ];
 }
