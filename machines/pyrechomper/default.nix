@@ -5,7 +5,7 @@
     ./hardware-configuration.nix
     ./router.nix
     ../../base
-    # ../../base/tailscale.nix
+    ../../base/tailscale.nix
   ];
 
   config = {
