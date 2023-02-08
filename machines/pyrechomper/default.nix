@@ -3,7 +3,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    # ./router.nix
+    ./router.nix
     ../../base
     # ../../base/tailscale.nix
   ];
