@@ -1,15 +1,41 @@
 { config, lib, pkgs, ... }:
 
-let cfg = {
-      nic = "enp2s0";
-      uplinkVlanId = 60;
-      localVlanId = 90;
+let nics = rec {
+      uplink = "enp2s0";
+      local = "enp3s0";
     };
 
-    vlanUplink = "wan${toString cfg.uplinkVlanId}";
-    vlanLocal = "lan${toString cfg.localVlanId}";
+    vlanIds = {
+      home = 90;
+      guest = 100;
+      iot = 105;
+    };
+
+    vlans = {
+      home = "home${toString vlanIds.home}";
+      guest = "home${toString vlanIds.guest}";
+      iot = "home${toString vlanIds.iot}";
+    };
 
 in {
+  # Create 2 separate VLAN devices for the localNIC.
+  networking.vlans = {
+    "${vlans.home}" = {
+      id = vlanIds.home;
+      interface = nics.local;
+    };
+
+    "${vlans.guest}" = {
+      id = vlanIds.guest;
+      interface = nics.local;
+    };
+
+    "${vlans.iot}" = {
+      id = vlanIds.iot;
+      interface = nics.local;
+    };
+  };
+  
   networking.networkmanager.enable = lib.mkForce false;
   networking.nameservers = [
     "8.8.8.8"  # Google
@@ -31,29 +57,10 @@ in {
     "net.ipv6.conf.default.forwarding" = true;
   };
 
-  # Create 2 separate VLAN devices for the NIC (e.g. enp2s0). One of the
-  # VLAN device will be used for the uplink, and the other one will be
-  # used for the internal network.
-  #
-  # TODO(breakds): Have more vlans in the future when needed.
-  networking.vlans = {
-    # uplink
-    "${vlanUplink}" = {
-      id = cfg.uplinkVlanId;
-      interface = cfg.nic;
-    };
-
-    # internal
-    "${vlanLocal}" = {
-      id = cfg.localVlanId;
-      interface = cfg.nic;
-    };
-  };
-
   # Enable DHCP
   services.dhcpd4 = {
     enable = true;
-    interfaces = [ vlanLocal ];
+    interfaces = [ vlans.home ];
     machines = [
       {
         ethernetAddress = "7C:10:C9:3C:52:B9";
@@ -107,6 +114,7 @@ in {
         ipAddress = "10.77.1.188";
       }
     ];
+    
     extraConfig = ''
       option domain-name-servers 1.1.1.1, 8.8.8.8, 8.8.4.4;
       option subnet-mask 255.255.255.0;
@@ -115,7 +123,7 @@ in {
       max-lease-time 25920000;
 
       subnet 10.77.1.0 netmask 255.255.255.0 {
-        interface ${vlanLocal};
+        interface ${vlans.home};
         range 10.77.1.20 10.77.1.240;
         option routers 10.77.1.1;
         option broadcast-address 10.77.1.255;
@@ -135,7 +143,7 @@ in {
     rejectPackets = false;
     # Traffic coming in from these interfaces will be accepted unconditionally. Traffic from the
     # loopback (lo) interface will always be accepted.
-    trustedInterfaces = [ vlanLocal ];
+    trustedInterfaces = [ vlans.home ];
     # Do not perform reverse path filter test on a packet.
     checkReversePath = false;
 
@@ -145,7 +153,7 @@ in {
     # already established connection.
     extraCommands = ''
       ip6tables -P FORWARD DROP
-      ip6tables -A FORWARD -i ${vlanLocal} -o ${vlanUplink} -j ACCEPT
+      ip6tables -A FORWARD -i ${vlans.home} -o ${nics.uplink} -j ACCEPT
       ip6tables -A FORWARD -i lo -j ACCEPT
       ip6tables -A FORWARD -o lo -j ACCEPT
       ip6tables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
@@ -156,8 +164,8 @@ in {
   networking.nat = {
     enable = true;
     enableIPv6 = false;
-    externalInterface = vlanUplink;
-    internalInterfaces = [ vlanLocal ];
+    externalInterface = nics.uplink;
+    internalInterfaces = [ vlans.home ];
     internalIPs = [ "10.77.1.0/24" ];
     forwardPorts = [
       { sourcePort = 22; destination = "10.77.1.130:22"; loopbackIPs = [ "23.119.127.221" ]; }
@@ -185,13 +193,13 @@ in {
   # 1. A as a Trunk Port that allows 60 and 90
   # 2. B as an Access (Untagged) Port with Vlan ID (and PVID) = 60
   # 3. C as an Access (Untagged) Port with Vlan ID (and PVID) = 90
-  networking.interfaces."${cfg.nic}".useDHCP = false;
+  # networking.interfaces."${cfg.nic}".useDHCP = false;
 
   # Let the modem "DHCP me" for the uplink VLAN. The modem is set to
   # IP Passthrough mode (for ATT, it is DHCPS-fixed more
   # specifically). This will pass the modem's public IP to the Uplink
   # (WAN) interface.
-  networking.interfaces."${vlanUplink}".useDHCP = true;
+  networking.interfaces."${nics.uplink}".useDHCP = true;
   # Now we need to make more specific configuration to the DHCP client
   # than handles the Uplink (WAN) interface because of IPv6. Credit to
   # KJ and Francis Begyn
@@ -209,7 +217,7 @@ in {
     # exists. I probably do not need persistent based on my
     # understanding, but I'll just keep it on.
     persistent = true;
-    allowInterfaces = [ vlanUplink ];
+    allowInterfaces = [ nics.uplink ];
 
     extraConfig = ''
       # Don't touch our DNS settings
@@ -227,7 +235,7 @@ in {
       # Do not solicit or accept IPv6 Router Advertisement.
       noipv6rs
 
-      interface ${vlanUplink}
+      interface ${nics.uplink}
         # Enable routing solicitation for Uplink (WAN)
         ipv6rs
         # Request an IPv6 address for iaid 1
@@ -238,7 +246,7 @@ in {
         # The suffix is set to 77 (Hex 4D)
         # An example IPv6 PD to LAN will look like
         # 3600:9200:7f7f:a66f::4d/64
-        ia_pd 2//56 ${vlanLocal}/0/64/77
+        ia_pd 2//56 ${vlans.home}/0/64/77
     '';
   };
 
@@ -251,11 +259,11 @@ in {
       };
       interfaces = [
         {
-          name = vlanUplink;
+          name = nics.uplink;
           monitor = false;              # see the remark below
         }
         {
-          name = vlanLocal;
+          name = vlans.home;
           advertise = true;
           prefix = [
             { prefix = "::/64"; }
@@ -265,7 +273,7 @@ in {
     };
   };
 
-  networking.interfaces."${vlanLocal}" = {
+  networking.interfaces."${vlans.home}" = {
     # This is going to be the router's IP to internal devices connects
     # to it.
     ipv4.addresses = [ {
@@ -295,7 +303,7 @@ in {
     enable = true;
     reflector = true;
     interfaces = [
-      vlanLocal
+      vlans.home
     ];
   };
 }
