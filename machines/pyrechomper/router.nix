@@ -13,8 +13,8 @@ let nics = rec {
 
     vlans = {
       home = "home${toString vlanIds.home}";
-      guest = "home${toString vlanIds.guest}";
-      iot = "home${toString vlanIds.iot}";
+      guest = "guest${toString vlanIds.guest}";
+      iot = "iot${toString vlanIds.iot}";
     };
 
 in {
@@ -60,7 +60,7 @@ in {
   # Enable DHCP
   services.dhcpd4 = {
     enable = true;
-    interfaces = [ vlans.home ];
+    interfaces = [ vlans.home vlans.guest ];
     machines = [
       {
         ethernetAddress = "7C:10:C9:3C:52:B9";
@@ -128,6 +128,12 @@ in {
         option routers 10.77.1.1;
         option broadcast-address 10.77.1.255;
       }
+      subnet 10.77.100.0 netmask 255.255.255.0 {
+        interface ${vlans.guest};
+        range 10.77.100.20 10.77.100.240;
+        option routers 10.77.100.1;
+        option broadcast-address 10.77.100.255;
+      }
     '';
   };
 
@@ -154,6 +160,7 @@ in {
     extraCommands = ''
       ip6tables -P FORWARD DROP
       ip6tables -A FORWARD -i ${vlans.home} -o ${nics.uplink} -j ACCEPT
+      ip6tables -A FORWARD -i ${vlans.guest} -o ${nics.uplink} -j ACCEPT
       ip6tables -A FORWARD -i lo -j ACCEPT
       ip6tables -A FORWARD -o lo -j ACCEPT
       ip6tables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
@@ -247,6 +254,8 @@ in {
         # An example IPv6 PD to LAN will look like
         # 3600:9200:7f7f:a66f::4d/64
         ia_pd 2//56 ${vlans.home}/0/64/77
+        # Request an IPv6 Prefix Delegation (PD) for iaid 100
+        ia_pd 100//56 ${vlans.guest}/0/64/77
     '';
   };
 
@@ -269,6 +278,13 @@ in {
             { prefix = "::/64"; }
           ];
         }
+        {
+          name = vlans.guest;
+          advertise = true;
+          prefix = [
+            { prefix = "::/64"; }
+          ];
+        }
       ];
     };
   };
@@ -278,6 +294,16 @@ in {
     # to it.
     ipv4.addresses = [ {
       address = "10.77.1.1";
+      prefixLength = 24;  # Subnet Mask = 255.255.255.0
+    } ];
+    useDHCP = false;
+  };
+
+  networking.interfaces."${vlans.guest}" = {
+    # This is going to be the router's IP to internal devices connects
+    # to it.
+    ipv4.addresses = [ {
+      address = "10.77.100.1";
       prefixLength = 24;  # Subnet Mask = 255.255.255.0
     } ];
     useDHCP = false;
