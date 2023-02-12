@@ -8,7 +8,7 @@ let nics = rec {
     vlanIds = {
       home = 90;
       guest = 100;
-      iot = 105;
+      iot = 104;
     };
 
     vlans = {
@@ -60,7 +60,7 @@ in {
   # Enable DHCP
   services.dhcpd4 = {
     enable = true;
-    interfaces = [ vlans.home vlans.guest ];
+    interfaces = [ vlans.home vlans.guest vlans.iot ];
     machines = [
       {
         ethernetAddress = "7C:10:C9:3C:52:B9";
@@ -114,7 +114,10 @@ in {
         ipAddress = "10.77.1.188";
       }
     ];
-    
+
+    # Note that I give a lot more IPs to the IoT subnet. The actual range is
+    # from 10.77.104.x - 10.77.107.x (i.e. 10.77.104.0/22). There should be 1022
+    # addresses to use.
     extraConfig = ''
       option domain-name-servers 1.1.1.1, 8.8.8.8, 8.8.4.4;
       option subnet-mask 255.255.255.0;
@@ -128,11 +131,19 @@ in {
         option routers 10.77.1.1;
         option broadcast-address 10.77.1.255;
       }
+
       subnet 10.77.100.0 netmask 255.255.255.0 {
         interface ${vlans.guest};
         range 10.77.100.20 10.77.100.240;
         option routers 10.77.100.1;
         option broadcast-address 10.77.100.255;
+      }
+
+      subnet 10.77.104.0 netmask 255.255.252.0 {
+        interface ${vlans.iot};
+        range 10.77.104.20 10.77.107.240;
+        option routers 10.77.104.1;
+        option broadcast-address 10.77.107.255;
       }
     '';
   };
@@ -160,7 +171,6 @@ in {
     extraCommands = ''
       ip6tables -P FORWARD DROP
       ip6tables -A FORWARD -i ${vlans.home} -o ${nics.uplink} -j ACCEPT
-      ip6tables -A FORWARD -i ${vlans.guest} -o ${nics.uplink} -j ACCEPT
       ip6tables -A FORWARD -i lo -j ACCEPT
       ip6tables -A FORWARD -o lo -j ACCEPT
       ip6tables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
@@ -172,8 +182,8 @@ in {
     enable = true;
     enableIPv6 = false;
     externalInterface = nics.uplink;
-    internalInterfaces = [ vlans.home vlans.guest ];
-    internalIPs = [ "10.77.1.0/24" "10.77.100.0/24" ];
+    internalInterfaces = [ vlans.home vlans.guest vlans.iot ];
+    internalIPs = [ "10.77.1.0/24" "10.77.100.0/24" "10.77.104.0/22" ];
     forwardPorts = [
       { sourcePort = 22; destination = "10.77.1.130:22"; loopbackIPs = [ "23.119.127.221" ]; }
       { sourcePort = 80; destination = "10.77.1.130:80"; loopbackIPs = [ "23.119.127.221" ]; }
@@ -181,32 +191,12 @@ in {
     ];
   };
 
-  # Topology for the managed switch:
-  #
-  #
-  #
-  #  +-----+-----+-----+
-  #  |  A  |  B  |  C  | <- managed switch
-  #  |     |     |     |
-  #  +--|--+--|--+--|--+
-  #     |     |     +------------------ Wifi AP/Devices
-  #     |     |
-  #     |     +------------ Modem
-  #   router
-  #
-  # If the vlan ID for wan is 60, and the vlan ID for lan is 90, we
-  # need to configure
-  #
-  # 1. A as a Trunk Port that allows 60 and 90
-  # 2. B as an Access (Untagged) Port with Vlan ID (and PVID) = 60
-  # 3. C as an Access (Untagged) Port with Vlan ID (and PVID) = 90
-  # networking.interfaces."${cfg.nic}".useDHCP = false;
-
   # Let the modem "DHCP me" for the uplink VLAN. The modem is set to
   # IP Passthrough mode (for ATT, it is DHCPS-fixed more
   # specifically). This will pass the modem's public IP to the Uplink
   # (WAN) interface.
   networking.interfaces."${nics.uplink}".useDHCP = true;
+
   # Now we need to make more specific configuration to the DHCP client
   # than handles the Uplink (WAN) interface because of IPv6. Credit to
   # KJ and Francis Begyn
@@ -216,7 +206,6 @@ in {
   # LAN interface(s), so that together with a router advertisement
   # service it can provide automatic IPv6 address configuration for
   # the internal network.
-
   networking.dhcpcd = {
     enable = true;
 
@@ -296,6 +285,16 @@ in {
     ipv4.addresses = [ {
       address = "10.77.100.1";
       prefixLength = 24;  # Subnet Mask = 255.255.255.0
+    } ];
+    useDHCP = false;
+  };
+
+  networking.interfaces."${vlans.iot}" = {
+    # This is going to be the router's IP to internal devices connects
+    # to it.
+    ipv4.addresses = [ {
+      address = "10.77.104.1";
+      prefixLength = 22;  # Subnet Mask = 255.255.252.0
     } ];
     useDHCP = false;
   };
