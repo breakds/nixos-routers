@@ -62,6 +62,7 @@ in {
     enable = true;
     interfaces = [ vlans.home vlans.guest vlans.iot ];
     machines = [
+      # Home network
       {
         ethernetAddress = "7C:10:C9:3C:52:B9";
         hostName = "gilgamesh";
@@ -112,6 +113,13 @@ in {
         ethernetAddress = "dc:a6:32:8d:66:dd";
         hostName = "armlet";
         ipAddress = "10.77.1.188";
+      }
+
+      # IoT Network
+      {
+        ethernetAddress = "dc:e5:5b:c8:da:1a";
+        hostName = "office-display";
+        ipAddress = "10.77.105.101";
       }
     ];
 
@@ -320,6 +328,7 @@ in {
     reflector = true;
     interfaces = [
       vlans.home
+      vlans.iot
     ];
   };
 }
