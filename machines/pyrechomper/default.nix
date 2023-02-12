@@ -51,6 +51,17 @@
       pulse.enable = true;
     };
 
+    # Router specific
+
+    # Use the XanMod Linux Kernel. It is a set of patches reducing latency and
+    # improving performance.
+    # https://dataswamp.org/~solene/2022-08-03-nixos-with-live-usb-router.html#_Kernel_and_system
+    boot.kernelPackages = pkgs.linuxPackages_xanmod_latest;
+
+    # The service irqbalance is useful as it assigns certain IRQ calls to
+    # specific CPUs instead of letting the first CPU core to handle everything.
+    # This is supposed to increase performance by hitting CPU cache more often.
+    services.irqbalance.enable = true;
 
     # This value determines the NixOS release from which the default settings
     # for stateful data, like file locations and database versions on your

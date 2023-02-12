@@ -1,5 +1,10 @@
 { config, lib, pkgs, ... }:
 
+# TODO(breakds)
+# 1. Add mitmproxy
+# 2. Use dnsmasq for DNS and DHCP
+# 3. Adding unbound: https://dataswamp.org/~solene/2022-08-03-nixos-with-live-usb-router.html#_Networking_services
+
 let nics = rec {
       uplink = "enp2s0";
       local = "enp3s0";
@@ -15,6 +20,10 @@ let nics = rec {
       home = "home${toString vlanIds.home}";
       guest = "guest${toString vlanIds.guest}";
       iot = "iot${toString vlanIds.iot}";
+    };
+
+    ips = {
+      office-display = "10.77.105.101";
     };
 
 in {
@@ -119,7 +128,7 @@ in {
       {
         ethernetAddress = "dc:e5:5b:c8:da:1a";
         hostName = "office-display";
-        ipAddress = "10.77.105.101";
+        ipAddress = ips.office-display;
       }
     ];
 
@@ -183,6 +192,8 @@ in {
       ip6tables -A FORWARD -o lo -j ACCEPT
       ip6tables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
     '';
+    # TODO(breakds): Keep IoT devices from being able to access the
+    # main network unless specifically allowed.
   };
 
   # NAT
