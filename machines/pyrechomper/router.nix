@@ -166,7 +166,7 @@ in {
         interface ${vlans.guest};
         range 10.77.100.20 10.77.100.240;
         option routers 10.77.100.1;
-        option domain-name-servers 10.77.100.1;
+        option domain-name-servers 1.1.1.1, 8.8.8.8, 8.8.4.4;
         option broadcast-address 10.77.100.255;
       }
 
@@ -174,7 +174,7 @@ in {
         interface ${vlans.iot};
         range 10.77.104.20 10.77.107.240;
         option routers 10.77.104.1;
-        option domain-name-servers 10.77.104.1;
+        option domain-name-servers 1.1.1.1, 8.8.8.8, 8.8.4.4;
         option broadcast-address 10.77.107.255;
       }
     '';
