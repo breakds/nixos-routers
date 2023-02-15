@@ -77,6 +77,10 @@ in {
     ];
     resolveLocalQueries = false;
     # DHCP is disabled by default. Use dhcpd below.
+
+    extraConfig = ''
+      cache-size=1600
+    '';
   };
 
   # Enable DHCP
