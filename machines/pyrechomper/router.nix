@@ -44,7 +44,7 @@ in {
       interface = nics.local;
     };
   };
-  
+
   networking.networkmanager.enable = lib.mkForce false;
   networking.nameservers = [
     "8.8.8.8"  # Google
@@ -64,6 +64,19 @@ in {
     "net.ipv4.conf.default.forwarding" = true;
     "net.ipv6.conf.all.forwarding" = true;
     "net.ipv6.conf.default.forwarding" = true;
+  };
+
+  services.dnsmasq = {
+    enable = true;
+    servers = [
+      "1.1.1.1"
+      "8.8.8.8"
+      "8.8.4.4"
+      "2606:4700:4700::1111"  # Cloudflare IPv6 one.one.one.one
+      "2606:4700:4700::1001"  # Cloudflare IPv6 one.one.one.one
+    ];
+    resolveLocalQueries = false;
+    # DHCP is disabled by default. Use dhcpd below.
   };
 
   # Enable DHCP
@@ -136,7 +149,6 @@ in {
     # from 10.77.104.x - 10.77.107.x (i.e. 10.77.104.0/22). There should be 1022
     # addresses to use.
     extraConfig = ''
-      option domain-name-servers 1.1.1.1, 8.8.8.8, 8.8.4.4;
       option subnet-mask 255.255.255.0;
 
       default-lease-time 25920000;
@@ -146,6 +158,7 @@ in {
         interface ${vlans.home};
         range 10.77.1.20 10.77.1.240;
         option routers 10.77.1.1;
+        option domain-name-servers 10.77.1.1;
         option broadcast-address 10.77.1.255;
       }
 
@@ -153,6 +166,7 @@ in {
         interface ${vlans.guest};
         range 10.77.100.20 10.77.100.240;
         option routers 10.77.100.1;
+        option domain-name-servers 10.77.100.1;
         option broadcast-address 10.77.100.255;
       }
 
@@ -160,6 +174,7 @@ in {
         interface ${vlans.iot};
         range 10.77.104.20 10.77.107.240;
         option routers 10.77.104.1;
+        option domain-name-servers 10.77.104.1;
         option broadcast-address 10.77.107.255;
       }
     '';
