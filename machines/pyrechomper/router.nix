@@ -2,7 +2,6 @@
 
 # TODO(breakds)
 # 1. Add mitmproxy
-# 2. Use dnsmasq for DNS and DHCP
 # 3. Adding unbound: https://dataswamp.org/~solene/2022-08-03-nixos-with-live-usb-router.html#_Networking_services
 
 let nics = rec {
@@ -66,21 +65,24 @@ in {
     "net.ipv6.conf.default.forwarding" = true;
   };
 
-  services.dnsmasq = {
+  services.unbound = {
     enable = true;
-    servers = [
-      "1.1.1.1"
-      "8.8.8.8"
-      "8.8.4.4"
-      "2606:4700:4700::1111"  # Cloudflare IPv6 one.one.one.one
-      "2606:4700:4700::1001"  # Cloudflare IPv6 one.one.one.one
-    ];
-    resolveLocalQueries = false;
-    # DHCP is disabled by default. Use dhcpd below.
+    settings = {
+      server = {
+        interface = [ "127.0.0.1" "10.77.1.1" ];
+        access-control =  [
+          "0.0.0.0/0 refuse"
+          "127.0.0.0/8 allow"
+          "10.77.1.0/24 allow"
+        ];
+      };
+    };
+  };
 
-    extraConfig = ''
-      cache-size=1600
-    '';
+  # Open port 53 for downlink DNS request
+  networking.firewall.interfaces."${vlans.home}" = {
+    allowedTCPPorts = [ 53 ];
+    allowedUDPPorts = [ 53 ];
   };
 
   # Enable DHCP
