@@ -2,7 +2,6 @@
 
 # TODO(breakds)
 # 1. Add mitmproxy
-# 3. Adding unbound: https://dataswamp.org/~solene/2022-08-03-nixos-with-live-usb-router.html#_Networking_services
 
 let nics = rec {
       uplink = "enp2s0";
