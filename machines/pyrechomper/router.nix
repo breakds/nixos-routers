@@ -66,6 +66,9 @@ in {
 
   services.unbound = {
     enable = true;
+    # I think this is important because I may accidently break the unbound
+    # server during debugging or testing new configuration, and this keeps the
+    # router's DNS queries being answered even when unbound is down.
     resolveLocalQueries = false;
     settings = {
       server = {
@@ -75,8 +78,8 @@ in {
           "127.0.0.0/8 allow"
           "10.77.1.0/24 allow"
         ];
-	prefetch = "yes";
-      };      
+	      prefetch = "yes";
+      };
 
       # https://gist.github.com/BigSully/a36cb8763eb7832a6c1f7d25fc174c09
       forward-zone = [
@@ -85,25 +88,25 @@ in {
           forward-tls-upstream = "yes";
 
           forward-addr = [
-            ## Google	
-  	    "8.8.8.8@853#dns.google"
+            # Google
+  	        "8.8.8.8@853#dns.google"
             "8.8.4.4@853#dns.google"
             "2001:4860:4860::8888@853#dns.google"
             "2001:4860:4860::8844@853#dns.google"
-      
-            ## Cloudflare
+
+            # Cloudflare
             "1.1.1.1@853#cloudflare-dns.com"
             "1.0.0.1@853#cloudflare-dns.com"
             "2606:4700:4700::1111@853#cloudflare-dns.com"
             "2606:4700:4700::1001@853#cloudflare-dns.com"
-      
-            ## Quad9  ( Slowest, only serve as backup when the faster are
-	    ## temporarily down. )
+
+            # Quad9 ( Slowest, only serve as backup when the faster are
+	          # temporarily down. )
             "149.112.112.112@853#dns.quad9.net"
             "9.9.9.10@853#dns.quad9.net"
             "2620:fe::fe@853#dns.quad9.net"
             "2620:fe::9@853#dns.quad9.net"
-	  ];
+	        ];
         }
       ];
     };
