@@ -245,13 +245,6 @@ in {
       ip6tables -A FORWARD -i lo -j ACCEPT
       ip6tables -A FORWARD -o lo -j ACCEPT
       ip6tables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
-
-
-      # Block traffic between iot and home
-      iptables -A nixos-fw -i ${vlans.home} -o ${vlans.iot} -j DROP
-      iptables -A nixos-fw -i ${vlans.iot} -o ${vlans.home} -j DROP
-      ip6tables -A nixos-fw -i ${vlans.home} -o ${vlans.iot} -j DROP
-      ip6tables -A nixos-fw -i ${vlans.iot} -o ${vlans.home} -j DROP
     '';
     # TODO(breakds): Keep IoT devices from being able to access the
     # main network unless specifically allowed.
