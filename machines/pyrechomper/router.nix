@@ -48,7 +48,7 @@ in {
     "8.8.8.8"  # Google
     "1.1.1.1"  # Cloudflare
     "2606:4700:4700::1111"  # Cloudflare IPv6 one.one.one.one
-    "2606:4700:4700::1001"  # Cloudflare IPv6 one.one.one.one
+    "2606:4700:4700::1001"  # Cloudflare IPv6 one.zero.zero.one
   ];
 
   networking.enableIPv6 = true;
