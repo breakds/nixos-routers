@@ -51,6 +51,34 @@
       pulse.enable = true;
     };
 
+    # A container for VPN and other stuff
+    containers.limbius = {
+      autoStart = true;
+      macvlans = [ "ctn91" ];
+
+      config = { config, pkgs, ... }: {
+        networking.interfaces."mv-ctn91" = {
+          ipv4.addresses = [ { address = "10.77.91.5"; prefixLength = 24; } ];
+        };
+
+        users.users.breakds = {
+          isNormalUser = true;
+          home = "/home/breakds";
+          extraGroups = [ "wheel" ];
+          createHome = true;
+          openssh.authorizedKeys.keyFiles = [
+            ../../data/keys/breakds_samaritan.pub
+          ];
+        };
+
+        services.openssh = {
+          enable = true;
+          permitRootLogin = "no";
+          passwordAuthentication = false;
+        };
+      };
+    };
+
     # Router specific
 
     # Use the XanMod Linux Kernel. It is a set of patches reducing latency and
