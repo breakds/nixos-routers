@@ -64,6 +64,7 @@
         networking.interfaces."mv-ctn91" = {
           ipv4.addresses = [ { address = "10.77.91.5"; prefixLength = 24; } ];
         };
+        networking.defaultGateway = "10.77.1.1";
 
         users.users.breakds = {
           isNormalUser = true;
