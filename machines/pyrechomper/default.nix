@@ -80,6 +80,12 @@
           permitRootLogin = "no";
           passwordAuthentication = false;
         };
+
+        environment.systemPackages = with pkgs; [
+          emacs git pass openconnect tmux
+        ];
+
+        system.stateVersion = "22.11";
       };
     };
 
