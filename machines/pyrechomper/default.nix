@@ -85,6 +85,14 @@
           emacs git pass openconnect tmux
         ];
 
+        # Allow sudo without password
+        security.sudo.extraRules = [
+          {
+            users = [ "breakds" ];
+            commands = [ { command = "ALL"; options = [ "NOPASSWD" ];} ];
+          }
+        ];
+
         system.stateVersion = "22.11";
       };
     };
