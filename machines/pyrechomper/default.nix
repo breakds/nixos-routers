@@ -54,7 +54,11 @@
     # A container for VPN and other stuff
     containers.limbius = {
       autoStart = true;
-      macvlans = [ "ctn91" ];
+      # Setting privateNetwork = true; for the container is not necessary when
+      # using macvlan for container networking. When using macvlan, the
+      # container will have its own network interface, separate from the host's
+      # interface, and it will appear as an independent device on the network.
+      macvlans = [ "ctn91" ];  # This is the vlan configured in router.nix.
 
       config = { config, pkgs, ... }: {
         networking.interfaces."mv-ctn91" = {
