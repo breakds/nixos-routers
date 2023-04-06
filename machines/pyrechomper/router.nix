@@ -12,18 +12,12 @@ let nics = rec {
       home = 90;
       guest = 100;
       iot = 104;
-      ctn = 91;  # For Containers
     };
 
     vlans = {
       home = "home${toString vlanIds.home}";
       guest = "guest${toString vlanIds.guest}";
       iot = "iot${toString vlanIds.iot}";
-      ctn = "ctn${toString vlanIds.ctn}";
-    };
-
-    macvlans = {
-      ctn-host = "mv-${vlans.ctn}-host";
     };
 
     ips = {
@@ -47,21 +41,6 @@ in {
       id = vlanIds.iot;
       interface = nics.local;
     };
-
-    "${vlans.ctn}" = {
-      id = vlanIds.ctn;
-      interface = nics.local;
-    };
-  };
-
-  # Create a macvlan bridge for the containers on this router.
-  networking.macvlans."${macvlans.ctn-host}" = {
-    interface = vlans.ctn;
-    mode = "bridge";
-  };
-
-  networking.interfaces."${macvlans.ctn-host}" = {
-    ipv4.addresses = [ { address = "10.77.91.1"; prefixLength = 24; } ];
   };
 
   networking.networkmanager.enable = lib.mkForce false;
