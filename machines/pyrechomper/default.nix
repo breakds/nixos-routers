@@ -57,6 +57,7 @@
       privateNetwork = true;
       # Steal host's physical interface ETH3 (enp4s0).
       interfaces = [ "enp4s0" ];
+      enableTun = true;
 
       config = { config, pkgs, ... }: {
         networking.interfaces.enp4s0.useDHCP = true;
