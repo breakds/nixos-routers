@@ -22,6 +22,7 @@ let nics = rec {
 
     ips = {
       office-display = "10.77.105.101";
+      limbius = "10.77.1.193";
     };
 
 in {
@@ -181,6 +182,13 @@ in {
         ethernetAddress = "dc:e5:5b:c8:da:1a";
         hostName = "office-display";
         ipAddress = ips.office-display;
+      }
+
+      # Container
+      {
+        ethernetAddress = "  7c:2b:e1:13:8c:8d";  # ETH3 (enp4s0)
+        hostName = "limbius";
+        ipAddress = ips.limbius;
       }
     ];
 
