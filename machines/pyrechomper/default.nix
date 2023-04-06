@@ -54,8 +54,13 @@
     # A container for VPN and other stuff
     containers.limbius = {
       autoStart = true;
+      privateNetwork = true;
+      # Steal host's physical interface ETH3 (enp4s0).
+      interfaces = [ "enp4s0" ];
 
       config = { config, pkgs, ... }: {
+        networking.interfaces.enp4s0.useDHCP = true;
+
         users.users.breakds = {
           isNormalUser = true;
           home = "/home/breakds";
