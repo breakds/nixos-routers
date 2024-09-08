@@ -123,109 +123,101 @@ in {
     allowedUDPPorts = [ 53 ];
   };
 
-  # Enable DHCP
-  # TODO(breakds): Replace with kea
-  services.dhcpd4 = {
+  # https://kea.readthedocs.io/en/kea-2.4.1/arm/dhcp4-srv.html
+  services.kea.dhcp4 = {
     enable = true;
-    interfaces = [ vlans.home vlans.guest vlans.iot ];
-    machines = [
-      # Home network
-      {
-        ethernetAddress = "7C:10:C9:3C:52:B9";
-        hostName = "gilgamesh";
-        ipAddress = "10.77.1.117";
-      }
-      {
-        ethernetAddress = "24:b6:fd:f6:25:a4"; # iDrac of richelieu
-        hostName = "idracJHVPDV1";
-        ipAddress = "10.77.1.120";
-      }
-      {
-        ethernetAddress = "d4:ae:52:98:bc:3c"; # Note that this is the 1st nic
-        hostName = "richelieu";
-        ipAddress = "10.77.1.121";
-      }
-      {
-        ethernetAddress = "fc:34:97:68:ef:35"; # eno1
-        hostName = "octavian";
-        ipAddress = "10.77.1.130";
-      }
-      {
-        ethernetAddress = "FC:34:97:A5:CB:C2";  # Ethernet Port 0, the lower one
-        hostName = "lothric";
-        ipAddress = "10.77.1.127";
-      }
-      {
-        ethernetAddress = "FC:34:97:A5:CF:55";  # Ethernet Port 0, the lower one
-        hostName = "lorian";
-        ipAddress = "10.77.1.128";
-      }
-      {
-        ethernetAddress = "DC:71:96:98:95:EF";  # The WiFi
-        hostName = "zero";
-        ipAddress = "10.77.1.221";
-      }
-      {
-        # WiFi
-        ethernetAddress = "04:cf:4b:21:68:6c";
-        hostName = "hand";
-        ipAddress = "10.77.1.187";
-      }
-      {
-        ethernetAddress = "a0:36:bc:bb:4f:8e";
-        hostName = "malenia";
-        ipAddress = "10.77.1.185";
-      }
-      {
-        ethernetAddress = "dc:a6:32:8d:66:dd";
-        hostName = "armlet";
-        ipAddress = "10.77.1.188";
-      }
 
-      # IoT Network
-      # None at this moment
+    settings = {
+      # A 7-day valid lifetime before a device need to to be renewed. Having
+      # such a long valid lifetime because the devices are mostly connected and
+      # stays in connection for long.
+      valid-lifetime = 604800;
+      renew-timer = 302400;   # 50.0% of the valid-lifetime.
+      rebind-timer = 529200;  # 87.5% of the valid-lifetime.
 
-      # Container
-      {
-        ethernetAddress = "  7c:2b:e1:13:8c:8d";  # ETH3 (enp4s0)
-        hostName = "limbius";
-        ipAddress = ips.limbius;
-      }
-    ];
+      # The interfaces to be used by the server.
+      interfaces-config = {
+        interfaces = [ vlans.home vlans.guest vlans.iot ];
+      };
 
-    # Note that I give a lot more IPs to the IoT subnet. The actual range is
-    # from 10.77.104.x - 10.77.107.x (i.e. 10.77.104.0/22). There should be 1022
-    # addresses to use.
-    extraConfig = ''
-      option subnet-mask 255.255.255.0;
+      lease-database = {
+        type = "memfile";
+        persist = true;
+        name = "/var/lib/kea/dhcp4.leases";
+      };
 
-      default-lease-time 25920000;
-      max-lease-time 25920000;
+      # For the option data, the valid options can be found here:
+      # https://kea.readthedocs.io/en/kea-2.4.1/arm/dhcp4-srv.html#dhcp4-std-options-list
+      subnet4 = [
+        {
+          subnet = "10.77.1.0/24";
+          interface = vlans.home;
+          pools = [ { pool = "10.77.1.20 - 10.77.1.240"; } ];
+          option-data = [
+            { name = "routers"; data = "10.77.1.1"; }
+            { name = "domain-name-servers"; data = "10.77.1.1"; }
+            { name = "broadcast-address"; data = "10.77.1.255"; }
+            { name = "subnet-mask"; data = "255.255.255.0"; }
+          ];
+          reservations = [
+            { hw-address = "7C:10:C9:3C:52:B9";
+              ip-address = "10.77.1.117";
+              hostname = "gilgamesh"; }
 
-      subnet 10.77.1.0 netmask 255.255.255.0 {
-        interface ${vlans.home};
-        range 10.77.1.20 10.77.1.240;
-        option routers 10.77.1.1;
-        option domain-name-servers 10.77.1.1;
-        option broadcast-address 10.77.1.255;
-      }
+            { hw-address = "fc:34:97:68:ef:35";  # eno1
+              ip-address = "10.77.1.130";
+              hostname = "octavian"; }
 
-      subnet 10.77.100.0 netmask 255.255.255.0 {
-        interface ${vlans.guest};
-        range 10.77.100.20 10.77.100.240;
-        option routers 10.77.100.1;
-        option domain-name-servers 1.1.1.1, 8.8.8.8, 8.8.4.4;
-        option broadcast-address 10.77.100.255;
-      }
+            { hw-address = "FC:34:97:A5:CB:C2";  # The lower port
+              ip-address = "10.77.1.127";
+              hostname = "lothric"; }
 
-      subnet 10.77.104.0 netmask 255.255.252.0 {
-        interface ${vlans.iot};
-        range 10.77.104.20 10.77.107.240;
-        option routers 10.77.104.1;
-        option domain-name-servers 1.1.1.1, 8.8.8.8, 8.8.4.4;
-        option broadcast-address 10.77.107.255;
-      }
-    '';
+            { hw-address = "FC:34:97:A5:CF:55";  # The lower port
+              ip-address = "10.77.1.128";
+              hostname = "lorian"; }
+
+            { hw-address = "04:cf:4b:21:68:6c"; # wifi
+              ip-address = "10.77.1.187";
+              hostname = "hand"; }
+
+            { hw-address = "a0:36:bc:bb:4f:8e";
+              ip-address = "10.77.1.185";
+              hostname = "malenia"; }
+
+            {
+              hw-address = "7c:2b:e1:13:8c:8d";  # ETH3 of this router (enp4s0)
+              ip-address = "10.77.1.193";
+              hostname = "limbius"; }
+          ];
+        }
+
+        {
+          subnet = "10.77.100.0/24";
+          interface = vlans.guest;
+          pools = [ { pool = "10.77.100.20 - 10.77.100.240"; } ];
+          option-data = [
+            { name = "routers"; data = "10.77.100.1"; }
+            { name = "domain-name-servers"; data = "1.1.1.1, 8.8.8.8, 8.8.4.4"; }
+            { name = "broadcast-address"; data = "10.77.100.255"; }
+            { name = "subnet-mask"; data = "255.255.255.0"; }
+          ];
+        }
+
+        {
+          # A lot more IPs to the IoT subnet and therefore the netmask is only 22
+          # bits instead of the normal 24 bits.
+          subnet = "10.77.104.0/22";
+          interface = vlans.iot;
+          pools = [ { pool = "10.77.104.20 - 10.77.107.240"; } ];
+          option-data = [
+            { name = "routers"; data = "10.77.104.1"; }
+            { name = "domain-name-servers"; data = "1.1.1.1, 8.8.8.8, 8.8.4.4"; }
+            { name = "broadcast-address"; data = "10.77.107.255"; }
+            { name = "subnet-mask"; data = "255.255.252.0"; }
+          ];
+        }
+      ];
+    };
   };
 
   # Firewall
