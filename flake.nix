@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs2205.url = "github:NixOS/nixpkgs/nixos-22.05";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
 
     # TODO(breakds): Get rid of vital-modules
     # Use vital-modules, with the same nixpkgs
