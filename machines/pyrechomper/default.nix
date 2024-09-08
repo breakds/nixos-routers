@@ -33,8 +33,6 @@
       ];
     };
 
-    vital.graphical.enable = true;
-
     networking = {
       hostName = "pyrechomper";
       hostId = "c607c8de";
