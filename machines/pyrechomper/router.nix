@@ -2,6 +2,10 @@
 
 # TODO(breakds)
 # 1. Add mitmproxy
+# 2. kea
+# 3. networkd
+# 4. Use nftables
+# 5. Filter out martian packets using kernel option rp_filter (https://github.com/ghostbuster91/blogposts/blob/a2374f0039f8cdf4faddeaaa0347661ffc2ec7cf/router2023-part2/main.md)
 
 let nics = rec {
       uplink = "enp2s0";
@@ -26,6 +30,9 @@ let nics = rec {
     };
 
 in {
+  # Enable IPv6 as we want to support both IPv4 and IPv6.
+  networking.enableIPv6 = true;
+
   # Create 2 separate VLAN devices for the localNIC.
   networking.vlans = {
     "${vlans.home}" = {
@@ -52,9 +59,7 @@ in {
     "2606:4700:4700::1001"  # Cloudflare IPv6 one.zero.zero.one
   ];
 
-  networking.enableIPv6 = true;
-
-  # Enable Kernel IP Forwarding.
+  # Enable Kernel IP Forwarding (i.e. routing).
   #
   # For more details, refer to
   # https://unix.stackexchange.com/questions/14056/what-is-kernel-ip-forwarding
@@ -120,6 +125,7 @@ in {
   };
 
   # Enable DHCP
+  # TODO(breakds): Replace with kea
   services.dhcpd4 = {
     enable = true;
     interfaces = [ vlans.home vlans.guest vlans.iot ];
