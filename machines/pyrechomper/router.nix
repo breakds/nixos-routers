@@ -392,7 +392,7 @@ in {
   services.avahi = {
     enable = true;
     reflector = true;
-    interfaces = [
+    allowInterfaces = [
       vlans.home
       vlans.iot
     ];
