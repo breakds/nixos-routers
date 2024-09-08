@@ -2,10 +2,9 @@
 
 # TODO(breakds)
 # 1. Add mitmproxy
-# 2. kea
-# 3. networkd
-# 4. Use nftables
-# 5. Filter out martian packets using kernel option rp_filter (https://github.com/ghostbuster91/blogposts/blob/a2374f0039f8cdf4faddeaaa0347661ffc2ec7cf/router2023-part2/main.md)
+# 2. networkd
+# 3. Use nftables
+# 4. Filter out martian packets using kernel option rp_filter (https://github.com/ghostbuster91/blogposts/blob/a2374f0039f8cdf4faddeaaa0347661ffc2ec7cf/router2023-part2/main.md)
 
 let nics = rec {
       uplink = "enp2s0";
