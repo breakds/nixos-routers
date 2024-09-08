@@ -5,10 +5,12 @@
     nixpkgs2205.url = "github:NixOS/nixpkgs/nixos-22.05";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.11";
 
+    # TODO(breakds): Get rid of vital-modules
     # Use vital-modules, with the same nixpkgs
     vital-modules.url = "github:nixvital/vital-modules";
     vital-modules.inputs.nixpkgs.follows = "nixpkgs";
 
+    # TODO(breakds): Get rid of breakds-home
     # Use nixos-home, with the same nixpkgs
     nixos-home.url = "github:breakds/nixos-home";
     nixos-home.inputs.nixpkgs.follows = "nixpkgs";
