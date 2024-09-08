@@ -25,7 +25,6 @@ let nics = rec {
     };
 
     ips = {
-      office-display = "10.77.105.101";
       limbius = "10.77.1.193";
     };
 
@@ -184,11 +183,7 @@ in {
       }
 
       # IoT Network
-      {
-        ethernetAddress = "dc:e5:5b:c8:da:1a";
-        hostName = "office-display";
-        ipAddress = ips.office-display;
-      }
+      # None at this moment
 
       # Container
       {
