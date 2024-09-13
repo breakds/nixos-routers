@@ -25,6 +25,7 @@ let nics = rec {
 
     ips = {
       limbius = "10.77.1.193";
+      octavian = "10.77.1.130";
     };
 
 in {
@@ -164,7 +165,7 @@ in {
               hostname = "gilgamesh"; }
 
             { hw-address = "a8:a1:59:3a:9e:5a";  # enp6s0
-              ip-address = "10.77.1.130";
+              ip-address = ips.octavian;
               hostname = "octavian"; }
 
             { hw-address = "FC:34:97:A5:CB:C2";  # The lower port
@@ -185,7 +186,7 @@ in {
 
             {
               hw-address = "7c:2b:e1:13:8c:8d";  # ETH3 of this router (enp4s0)
-              ip-address = "10.77.1.193";
+              ip-address = ips.limbius;
               hostname = "limbius"; }
           ];
         }
@@ -258,9 +259,9 @@ in {
     internalInterfaces = [ vlans.home vlans.guest vlans.iot ];
     internalIPs = [ "10.77.1.0/24" "10.77.100.0/24" "10.77.104.0/22" ];
     forwardPorts = [
-      { sourcePort = 22; destination = "10.77.1.130:22"; loopbackIPs = [ "23.119.127.221" ]; }
-      { sourcePort = 80; destination = "10.77.1.130:80"; loopbackIPs = [ "23.119.127.221" ]; }
-      { sourcePort = 443; destination = "10.77.1.130:443"; loopbackIPs = [ "23.119.127.221" ]; }
+      { sourcePort = 22; destination = "${ips.octavian}:22"; loopbackIPs = [ "23.119.127.221" ]; }
+      { sourcePort = 80; destination = "${ips.octavian}:80"; loopbackIPs = [ "23.119.127.221" ]; }
+      { sourcePort = 443; destination = "${ips.octavian}:443"; loopbackIPs = [ "23.119.127.221" ]; }
     ];
   };
 
