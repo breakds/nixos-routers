@@ -163,7 +163,7 @@ in {
               ip-address = "10.77.1.117";
               hostname = "gilgamesh"; }
 
-            { hw-address = "fc:34:97:68:ef:35";  # eno1
+            { hw-address = "a8:a1:59:3a:9e:5a";  # enp6s0
               ip-address = "10.77.1.130";
               hostname = "octavian"; }
 
