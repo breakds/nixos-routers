@@ -379,8 +379,9 @@ in {
 
   # iperf3 Server for speed/bandwidth testing
   services.iperf3 = {
-    enable = true;
-    openFirewall = true;
+    # NOTE(breakds): Open this when testing is needed.
+    enable = false;
+    openFirewall = false;
   };
 
   # Other helpful tools
