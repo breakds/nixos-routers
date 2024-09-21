@@ -26,6 +26,7 @@ let nics = rec {
     ips = {
       limbius = "10.77.1.193";
       octavian = "10.77.1.130";
+      octavian-10g = "10.77.1.131";
     };
 
 in {
@@ -164,8 +165,12 @@ in {
               ip-address = "10.77.1.117";
               hostname = "gilgamesh"; }
 
-            { hw-address = "a8:a1:59:3a:9e:5a";  # enp6s0
-              ip-address = ips.octavian;
+            # { hw-address = "a8:a1:59:3a:9e:5a";  # enp6s0
+            #   ip-address = ips.octavian;
+            #   hostname = "octavian"; }
+
+            { hw-address = "b4:96:91:9f:f9:f8";  # enp4s0f0 (Intel X550-T2, Upper)
+              ip-address = ips.octavian-10g;
               hostname = "octavian"; }
 
             { hw-address = "FC:34:97:A5:CB:C2";  # The lower port
@@ -259,9 +264,9 @@ in {
     internalInterfaces = [ vlans.home vlans.guest vlans.iot ];
     internalIPs = [ "10.77.1.0/24" "10.77.100.0/24" "10.77.104.0/22" ];
     forwardPorts = [
-      { sourcePort = 22; destination = "${ips.octavian}:22"; loopbackIPs = [ "23.119.127.221" ]; }
-      { sourcePort = 80; destination = "${ips.octavian}:80"; loopbackIPs = [ "23.119.127.221" ]; }
-      { sourcePort = 443; destination = "${ips.octavian}:443"; loopbackIPs = [ "23.119.127.221" ]; }
+      { sourcePort = 22; destination = "${ips.octavian-10g}:22"; loopbackIPs = [ "23.119.127.221" ]; }
+      { sourcePort = 80; destination = "${ips.octavian-10g}:80"; loopbackIPs = [ "23.119.127.221" ]; }
+      { sourcePort = 443; destination = "${ips.octavian-10g}:443"; loopbackIPs = [ "23.119.127.221" ]; }
     ];
   };
 
