@@ -25,8 +25,8 @@ let nics = rec {
 
     ips = {
       limbius = "10.77.1.193";
-      octavian = "10.77.1.130";
       octavian-10g = "10.77.1.131";
+      radahn = "10.77.1.35";  # The upper ethernet port
     };
 
 in {
@@ -165,10 +165,6 @@ in {
               ip-address = "10.77.1.117";
               hostname = "gilgamesh"; }
 
-            # { hw-address = "a8:a1:59:3a:9e:5a";  # enp6s0
-            #   ip-address = ips.octavian;
-            #   hostname = "octavian"; }
-
             { hw-address = "b4:96:91:9f:f9:f8";  # enp4s0f0 (Intel X550-T2, Upper)
               ip-address = ips.octavian-10g;
               hostname = "octavian"; }
@@ -180,6 +176,10 @@ in {
             { hw-address = "FC:34:97:A5:CF:55";  # The lower port
               ip-address = "10.77.1.128";
               hostname = "lorian"; }
+
+            { hw-address = "58:11:22:d7:21:64";  # The upper port
+              ip-address = ips.radahn;
+              hostname = "radahn"; }
 
             { hw-address = "04:cf:4b:21:68:6c"; # wifi
               ip-address = "10.77.1.187";
