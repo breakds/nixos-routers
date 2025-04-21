@@ -27,6 +27,7 @@ let nics = rec {
       limbius = "10.77.1.193";
       octavian-10g = "10.77.1.131";
       radahn = "10.77.1.35";  # The upper ethernet port
+      forgery = "10.77.1.136";
     };
 
 in {
@@ -169,10 +170,6 @@ in {
               ip-address = ips.octavian-10g;
               hostname = "octavian"; }
 
-            { hw-address = "FC:34:97:A5:CB:C2";  # The lower port
-              ip-address = "10.77.1.127";
-              hostname = "lothric"; }
-
             { hw-address = "FC:34:97:A5:CF:55";  # The lower port
               ip-address = "10.77.1.128";
               hostname = "lorian"; }
@@ -193,6 +190,11 @@ in {
               hw-address = "7c:2b:e1:13:8c:8d";  # ETH3 of this router (enp4s0)
               ip-address = ips.limbius;
               hostname = "limbius"; }
+
+            {
+              hw-address = "1c:69:7a:03:9c:1a";
+              ip-address = ips.forgery;
+              hostname = "forgery"; }
           ];
         }
 
