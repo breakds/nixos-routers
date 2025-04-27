@@ -86,6 +86,10 @@ in {
           "10.77.1.0/24 allow"
         ];
 	      prefetch = "yes";
+
+        local-data = [
+          "temporal.breakds.org. A ${ips.octavian-10g}"
+        ];
       };
 
       # https://gist.github.com/BigSully/a36cb8763eb7832a6c1f7d25fc174c09
