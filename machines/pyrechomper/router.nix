@@ -88,7 +88,7 @@ in {
 	      prefetch = "yes";
 
         local-data = [
-          "\"temporal.breakds.org. 3600 IN A ${ips.octavian-10g}\""
+          "\"temporal.breakds.net. 3600 IN A ${ips.octavian-10g}\""
         ];
       };
 
