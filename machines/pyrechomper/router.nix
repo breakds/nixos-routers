@@ -28,6 +28,7 @@ let nics = rec {
       octavian-10g = "10.77.1.131";
       radahn = "10.77.1.35";  # The upper ethernet port
       forgery = "10.77.1.136";
+      brock = "10.77.1.45"; # The bottom-right port
     };
 
 in {
@@ -200,6 +201,11 @@ in {
               hw-address = "1c:69:7a:03:9c:1a";
               ip-address = ips.forgery;
               hostname = "forgery"; }
+
+            {
+              hw-address = "00:90:27:f7:39:76";
+              ip-address = ips.brock;
+              hostname = "brock"; }
           ];
         }
 
