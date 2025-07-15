@@ -29,6 +29,7 @@ let nics = rec {
       radahn = "10.77.1.35";  # The upper ethernet port
       forgery = "10.77.1.136";
       brock = "10.77.1.45"; # The bottom-right port
+      shelly-garage-door = "10.77.1.63";  # The Shelly 1 Gen 4 on Garage Door
     };
 
 in {
@@ -206,6 +207,11 @@ in {
               hw-address = "00:90:27:f7:39:76";
               ip-address = ips.brock;
               hostname = "brock"; }
+
+            {
+              hw-address = "cc:ba:97:c8:3f:68";
+              ip-address = ips.shelly-garage-door;
+            }
           ];
         }
 
