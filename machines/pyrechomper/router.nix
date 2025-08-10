@@ -31,6 +31,7 @@ let nics = rec {
       brock = "10.77.1.45"; # The bottom-right port
       shelly-garage-door = "10.77.1.63";  # The Shelly 1 Gen 4 on Garage Door
       solar-pi = "10.77.1.52";
+      shelly-office-light = "10.77.1.44";
     };
 
 in {
@@ -104,7 +105,7 @@ in {
 
           forward-addr = [
             # Google
-  	        "8.8.8.8@853#dns.google"
+  	    "8.8.8.8@853#dns.google"
             "8.8.4.4@853#dns.google"
             "2001:4860:4860::8888@853#dns.google"
             "2001:4860:4860::8844@853#dns.google"
@@ -121,7 +122,7 @@ in {
             "9.9.9.10@853#dns.quad9.net"
             "2620:fe::fe@853#dns.quad9.net"
             "2620:fe::9@853#dns.quad9.net"
-	        ];
+	  ];
         }
       ];
     };
@@ -217,6 +218,11 @@ in {
             {
               hw-address = "dc:a6:32:8d:66:e0";  # WiFi
               ip-address = ips.solar-pi;
+            }
+
+            {
+              hw-address = "28:37:2f:2a:4c:60";
+              ip-address = ips.shelly-office-light;
             }
           ];
         }
