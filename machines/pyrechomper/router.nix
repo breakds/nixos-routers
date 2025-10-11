@@ -84,11 +84,12 @@ in {
     resolveLocalQueries = false;
     settings = {
       server = {
-        interface = [ "127.0.0.1" "10.77.1.1" ];
+        interface = [ "127.0.0.1" "10.77.1.1" "10.77.104.1" ];
         access-control =  [
           "0.0.0.0/0 refuse"
           "127.0.0.0/8 allow"
           "10.77.1.0/24 allow"
+          "10.77.104.0/22 allow"
         ];
 	      prefetch = "yes";
 
@@ -131,6 +132,11 @@ in {
 
   # Open port 53 for downlink DNS request
   networking.firewall.interfaces."${vlans.home}" = {
+    allowedTCPPorts = [ 53 ];
+    allowedUDPPorts = [ 53 ];
+  };
+
+  networking.firewall.interfaces."${vlans.iot}" = {
     allowedTCPPorts = [ 53 ];
     allowedUDPPorts = [ 53 ];
   };
@@ -253,7 +259,8 @@ in {
           pools = [ { pool = "10.77.104.20 - 10.77.107.240"; } ];
           option-data = [
             { name = "routers"; data = "10.77.104.1"; }
-            { name = "domain-name-servers"; data = "1.1.1.1, 8.8.8.8, 8.8.4.4"; }
+            # Add 10.77.104.1 for unbound
+            { name = "domain-name-servers"; data = "10.77.104.1, 1.1.1.1, 8.8.8.8"; }
             { name = "broadcast-address"; data = "10.77.107.255"; }
             { name = "subnet-mask"; data = "255.255.252.0"; }
           ];
@@ -439,5 +446,6 @@ in {
       vlans.home
       vlans.iot
     ];
+    openFirewall = true;
   };
 }
