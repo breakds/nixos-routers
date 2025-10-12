@@ -33,6 +33,8 @@ let nics = rec {
       shelly-garage-door = "10.77.1.63";  # The Shelly 1 Gen 4 on Garage Door
       solar-pi = "10.77.1.52";
       shelly-office-light = "10.77.1.44";
+      aqara-g5-porch = "10.77.104.27";
+      aqara-g5-deck = "10.77.104.29";
     };
 
 in {
@@ -263,6 +265,19 @@ in {
             { name = "domain-name-servers"; data = "10.77.104.1, 1.1.1.1, 8.8.8.8"; }
             { name = "broadcast-address"; data = "10.77.107.255"; }
             { name = "subnet-mask"; data = "255.255.252.0"; }
+          ];
+          reservations = [
+            {
+              hw-address = "18:c2:3c:5a:9a:99";
+              ip-address = ips.aqara-g5-porch;
+              hostname = "aqara-g5-porch";
+            }
+
+            {
+              hw-address = "18:c2:3c:5a:8f:6a";
+              ip-address = ips.aqara-g5-deck;
+              hostname = "aqara-g5-deck";
+            }
           ];
         }
       ];
