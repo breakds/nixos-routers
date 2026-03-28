@@ -310,6 +310,14 @@ in {
       ip6tables -A FORWARD -i lo -j ACCEPT
       ip6tables -A FORWARD -o lo -j ACCEPT
       ip6tables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+      # RA Guard: Drop rogue IPv6 Router Advertisements (ICMPv6 type 134)
+      # from LAN interfaces. Only the router itself should send RAs.
+      # Note: This protects the router and cross-VLAN forwarding. For L2
+      # protection of clients on the same VLAN, enable RA guard on the switch.
+      ip6tables -A INPUT -i ${vlans.home} -p icmpv6 --icmpv6-type 134 -j DROP
+      ip6tables -A INPUT -i ${vlans.guest} -p icmpv6 --icmpv6-type 134 -j DROP
+      ip6tables -A INPUT -i ${vlans.iot} -p icmpv6 --icmpv6-type 134 -j DROP
     '';
     # TODO(breakds): Keep IoT devices from being able to access the
     # main network unless specifically allowed.
