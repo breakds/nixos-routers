@@ -29,7 +29,7 @@
 
     users.users."breakds" = {
       openssh.authorizedKeys.keyFiles = [
-        ../../data/keys/breakds_samaritan.pub
+        ../../data/keys/breakds_malenia.pub
       ];
     };
 
@@ -68,7 +68,7 @@
           extraGroups = [ "wheel" ];
           createHome = true;
           openssh.authorizedKeys.keyFiles = [
-            ../../data/keys/breakds_samaritan.pub
+            ../../data/keys/breakds_malenia.pub
           ];
         };
 
