@@ -30,11 +30,12 @@ let nics = rec {
       forgery = "10.77.1.136";
       cradle = "10.77.1.56";
       brock = "10.77.1.45"; # The bottom-right port
-      shelly-garage-door = "10.77.1.63";  # The Shelly 1 Gen 4 on Garage Door
+      shelly-garage-door = "10.77.1.63";  # The Shelly 1 Gen 4 on Garage Door (deprecated)
       solar-pi = "10.77.1.52";
       shelly-office-light = "10.77.1.44";
       aqara-g5-porch = "10.77.104.27";
       aqara-g5-deck = "10.77.104.29";
+      ratgdo = "10.77.104.38";
     };
 
 in {
@@ -277,6 +278,12 @@ in {
               hw-address = "18:c2:3c:5a:8f:6a";
               ip-address = ips.aqara-g5-deck;
               hostname = "aqara-g5-deck";
+            }
+
+            {
+              hw-address = "68:25:dd:fb:9d:5c";
+              ip-address = ips.ratgdo;
+              hostname = "ratgdo";
             }
           ];
         }
