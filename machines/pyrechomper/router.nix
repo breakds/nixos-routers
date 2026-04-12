@@ -47,6 +47,9 @@ let nics = rec {
         [ -z "$hostname" ] && continue
         [ "$expire" -lt "$NOW" ] 2>/dev/null && continue
 
+        # Strip trailing dots (e.g. "gilgamesh." → "gilgamesh").
+        hostname="''${hostname%.}"
+
         # Convert e.g. 10.77.1.35 to 35.1.77.10.in-addr.arpa.
         IFS='.' read -r a b c d <<< "$ip"
         ${pkgs.unbound}/bin/unbound-control local_data "''${d}.''${c}.''${b}.''${a}.in-addr.arpa. 3600 IN PTR ''${hostname}." || true
