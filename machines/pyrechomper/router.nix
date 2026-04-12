@@ -408,6 +408,10 @@ in {
       # Allow home network to reach the internet via IPv6.
       meta nfproto ipv6 iifname "${vlans.home}" oifname "${nics.uplink}" accept
 
+      # Allow home network to manage IoT devices (cameras, ratgdo, etc.).
+      # Return traffic is handled by conntrack (established/related).
+      iifname "${vlans.home}" oifname "${vlans.iot}" accept
+
       # RA Guard: block rogue Router Advertisements from crossing VLANs.
       icmpv6 type nd-router-advert drop
     '';
@@ -419,8 +423,6 @@ in {
       iifname { "${vlans.home}", "${vlans.guest}", "${vlans.iot}" } icmpv6 type nd-router-advert drop
     '';
 
-    # TODO(breakds): Keep IoT devices from being able to access the
-    # main network unless specifically allowed.
   };
 
   # NAT
