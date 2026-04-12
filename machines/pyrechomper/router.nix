@@ -37,8 +37,10 @@ in {
   networking.enableIPv6 = true;
 
   # Use systemd-networkd for declarative network configuration.
+  # Disable systemd-resolved since unbound + AdGuard Home handle DNS.
   networking.useNetworkd = true;
   networking.useDHCP = false;
+  services.resolved.enable = false;
   # Boot is considered online as soon as any one interface is up.
   # Without this, unused ports with no cable block boot for 2 minutes.
   systemd.network.wait-online.anyInterface = true;
