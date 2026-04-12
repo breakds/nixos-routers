@@ -34,7 +34,7 @@
     };
   };
 
-  users.extraUsers = {
+  users.users = {
     "breakds" = {
       shell = lib.mkDefault pkgs.zsh;
       useDefaultShell = false;
@@ -91,16 +91,17 @@
     };
 
     desktopManager.gnome.enable = true;
-    displayManager.gdm = {
-      enable = true;
-      # When using gdm, do not automatically suspend since we want to
-      # keep the server running.
-      autoSuspend = false;
-    };
   };
 
-  # Exclude some of the gnome3 packages
-  environment.gnome.excludePackages = with pkgs.gnome3; [
+  services.displayManager.gdm = {
+    enable = true;
+    # When using gdm, do not automatically suspend since we want to
+    # keep the server running.
+    autoSuspend = false;
+  };
+
+  # Exclude some of the gnome packages
+  environment.gnome.excludePackages = with pkgs; [
     epiphany
     gnome-software
     gnome-characters

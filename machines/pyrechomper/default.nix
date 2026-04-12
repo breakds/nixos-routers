@@ -43,8 +43,7 @@
       hostId = "c607c8de";
     };
 
-    # Sound
-    sound.enable = true;
+    # Sound (pipewire)
     hardware.pulseaudio.enable = false;
     security.rtkit.enable = true;
     services.pipewire = {
@@ -100,11 +99,6 @@
     };
 
     # Router specific
-
-    # Use the XanMod Linux Kernel. It is a set of patches reducing latency and
-    # improving performance.
-    # https://dataswamp.org/~solene/2022-08-03-nixos-with-live-usb-router.html#_Kernel_and_system
-    boot.kernelPackages = pkgs.linuxPackages_xanmod_latest;
 
     # The service irqbalance is useful as it assigns certain IRQ calls to
     # specific CPUs instead of letting the first CPU core to handle everything.
