@@ -287,7 +287,7 @@ in {
 
   # Open port 53 (DNS) and 3000 (AdGuard Home dashboard) for home VLAN.
   networking.firewall.interfaces."${vlans.home}" = {
-    allowedTCPPorts = [ 53 3000 ];
+    allowedTCPPorts = [ 22 53 3000 ];
     allowedUDPPorts = [ 53 ];
   };
 
@@ -460,7 +460,6 @@ in {
     rejectPackets = false;
     # Traffic coming in from these interfaces will be accepted unconditionally. Traffic from the
     # loopback (lo) interface will always be accepted.
-    trustedInterfaces = [ vlans.home ];
     # Drop packets with spoofed source addresses. "loose" checks that
     # some route to the source exists without requiring it to be via the
     # ingress interface, which avoids false drops on a multi-VLAN router.

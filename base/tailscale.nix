@@ -9,7 +9,6 @@
 
     networking.firewall = {
       allowedUDPPorts = [ config.services.tailscale.port ];
-      trustedInterfaces = [ "tailscale0" ];
     };
 
     environment.systemPackages = with pkgs; [ tailscale ];
