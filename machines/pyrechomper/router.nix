@@ -32,6 +32,27 @@ let nics = rec {
       ratgdo = "10.77.104.38";
     };
 
+    # Script that reads Kea DHCP leases and adds PTR records to
+    # unbound so that AdGuard Home can resolve client IPs to hostnames.
+    keaUnboundSync = pkgs.writeShellScript "kea-unbound-sync" ''
+      set -euo pipefail
+
+      LEASE_FILE="/var/lib/kea/dhcp4.leases.2"
+      [ ! -s "$LEASE_FILE" ] && LEASE_FILE="/var/lib/kea/dhcp4.leases"
+      [ ! -s "$LEASE_FILE" ] && exit 0
+
+      NOW=$(${pkgs.coreutils}/bin/date +%s)
+
+      ${pkgs.coreutils}/bin/tail -n +2 "$LEASE_FILE" | while IFS=',' read -r ip _ _ _ expire _ _ _ hostname _; do
+        [ -z "$hostname" ] && continue
+        [ "$expire" -lt "$NOW" ] 2>/dev/null && continue
+
+        # Convert e.g. 10.77.1.35 to 35.1.77.10.in-addr.arpa.
+        IFS='.' read -r a b c d <<< "$ip"
+        ${pkgs.unbound}/bin/unbound-control local_data "''${d}.''${c}.''${b}.''${a}.in-addr.arpa. 3600 IN PTR ''${hostname}." || true
+      done
+    '';
+
 in {
   # Enable IPv6 as we want to support both IPv4 and IPv6.
   networking.enableIPv6 = true;
@@ -179,6 +200,19 @@ in {
         ];
 	      prefetch = "yes";
 
+        # Serve reverse DNS for private subnets so AdGuard Home can
+        # resolve client IPs to hostnames via rDNS.  "transparent"
+        # means: answer if we have a PTR record, otherwise return
+        # NXDOMAIN (no upstream would answer for RFC1918 anyway).
+        local-zone = [
+          "\"1.77.10.in-addr.arpa.\" transparent"
+          "\"100.77.10.in-addr.arpa.\" transparent"
+          "\"104.77.10.in-addr.arpa.\" transparent"
+          "\"105.77.10.in-addr.arpa.\" transparent"
+          "\"106.77.10.in-addr.arpa.\" transparent"
+          "\"107.77.10.in-addr.arpa.\" transparent"
+        ];
+
         local-data = [
           "\"temporal.breakds.net. 3600 IN A ${ips.octavian-10g}\""
           "\"home.breakds.net. 3600 IN A ${ips.octavian-10g}\""
@@ -230,6 +264,11 @@ in {
         port = 53;
         upstream_dns = [ "127.0.0.1:5335" ];
         bootstrap_dns = [ "8.8.8.8" "1.1.1.1" ];
+      };
+      clients.runtime_sources = {
+        rdns = true;
+        arp = true;
+        hosts = true;
       };
     };
   };
@@ -481,6 +520,26 @@ in {
           ];
         }
       ];
+    };
+  };
+
+  # Periodically sync Kea DHCP hostnames into unbound as PTR records
+  # so that AdGuard Home's rDNS resolution shows device names.
+  systemd.services.kea-unbound-sync = {
+    description = "Sync Kea DHCP hostnames to unbound PTR records";
+    after = [ "unbound.service" "kea-dhcp4-server.service" ];
+    requires = [ "unbound.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = keaUnboundSync;
+    };
+  };
+
+  systemd.timers.kea-unbound-sync = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "2min";
+      OnUnitActiveSec = "1h";
     };
   };
 
