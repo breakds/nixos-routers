@@ -195,6 +195,9 @@ in {
     # Keep the router's own DNS independent of unbound so that a
     # broken unbound config doesn't lock us out.
     resolveLocalQueries = false;
+    # Enable the control socket so unbound-control can add PTR records
+    # at runtime (used by kea-unbound-sync).
+    localControlSocketPath = "/run/unbound/unbound.ctl";
     settings = {
       server = {
         # Unbound now only serves AdGuard Home on localhost.
