@@ -1,8 +1,5 @@
 { config, lib, pkgs, ... }:
 
-# TODO(breakds)
-# 1. networkd
-
 let nics = rec {
       uplink = "enp2s0";
       local = "enp3s0";
@@ -39,21 +36,88 @@ in {
   # Enable IPv6 as we want to support both IPv4 and IPv6.
   networking.enableIPv6 = true;
 
-  # Create 2 separate VLAN devices for the localNIC.
-  networking.vlans = {
-    "${vlans.home}" = {
-      id = vlanIds.home;
-      interface = nics.local;
+  # Use systemd-networkd for declarative network configuration.
+  networking.useNetworkd = true;
+  networking.useDHCP = false;
+
+  # VLAN devices on the trunk port (enp3s0).
+  systemd.network.netdevs = {
+    "10-${vlans.home}" = {
+      netdevConfig = { Kind = "vlan"; Name = vlans.home; };
+      vlanConfig.Id = vlanIds.home;
+    };
+    "10-${vlans.guest}" = {
+      netdevConfig = { Kind = "vlan"; Name = vlans.guest; };
+      vlanConfig.Id = vlanIds.guest;
+    };
+    "10-${vlans.iot}" = {
+      netdevConfig = { Kind = "vlan"; Name = vlans.iot; };
+      vlanConfig.Id = vlanIds.iot;
+    };
+  };
+
+  systemd.network.networks = {
+    # Trunk port: carries all VLAN traffic, no IP of its own.
+    "20-${nics.local}" = {
+      matchConfig.Name = nics.local;
+      vlan = [ vlans.home vlans.guest vlans.iot ];
+      networkConfig.LinkLocalAddressing = "no";
     };
 
-    "${vlans.guest}" = {
-      id = vlanIds.guest;
-      interface = nics.local;
+    # Uplink (WAN): gets public IPv4 via DHCP from the ATT modem
+    # (IP Passthrough / DHCPS-fixed mode) and IPv6 address + Prefix
+    # Delegation via DHCPv6. The delegated prefix is carved into /64
+    # subnets and assigned to downstream VLANs.
+    "20-${nics.uplink}" = {
+      matchConfig.Name = nics.uplink;
+      networkConfig = {
+        DHCP = "yes";
+        IPv6AcceptRA = true;
+        # Use a privacy address (RFC 7217) so the real MAC is not
+        # exposed to the internet.
+        IPv6PrivacyExtensions = true;
+      };
+      # Don't let the ISP's DHCP override our DNS settings.
+      dhcpV4Config.UseDNS = false;
+      dhcpV6Config = {
+        UseDNS = false;
+        # Request a /56 prefix block from ATT for internal networks.
+        PrefixDelegationHint = "::/56";
+      };
+      ipv6AcceptRAConfig.UseDNS = false;
     };
 
-    "${vlans.iot}" = {
-      id = vlanIds.iot;
-      interface = nics.local;
+    # Home VLAN: trusted devices. Gets a /64 carved from the
+    # delegated prefix so devices can auto-configure IPv6 addresses.
+    "30-${vlans.home}" = {
+      matchConfig.Name = vlans.home;
+      address = [ "10.77.1.1/24" ];
+      networkConfig = {
+        DHCPPrefixDelegation = true;
+        IPv6AcceptRA = false;
+      };
+      # Assign the first /64 subnet from the delegated prefix.
+      # Token = "::4d" sets the router's IPv6 address suffix to 0x4d
+      # (77 in decimal), matching the old dhcpcd configuration.
+      dhcpPrefixDelegationConfig = {
+        UplinkInterface = nics.uplink;
+        SubnetId = "0";
+        Token = "::4d";
+      };
+    };
+
+    # Guest VLAN: internet only, no access to other VLANs.
+    "30-${vlans.guest}" = {
+      matchConfig.Name = vlans.guest;
+      address = [ "10.77.100.1/24" ];
+      networkConfig.IPv6AcceptRA = false;
+    };
+
+    # IoT VLAN: limited access, /22 for more address space.
+    "30-${vlans.iot}" = {
+      matchConfig.Name = vlans.iot;
+      address = [ "10.77.104.1/22" ];
+      networkConfig.IPv6AcceptRA = false;
     };
   };
 
@@ -360,61 +424,6 @@ in {
     ];
   };
 
-  # Let the modem "DHCP me" for the uplink VLAN. The modem is set to
-  # IP Passthrough mode (for ATT, it is DHCPS-fixed more
-  # specifically). This will pass the modem's public IP to the Uplink
-  # (WAN) interface.
-  networking.interfaces."${nics.uplink}".useDHCP = true;
-
-  # Now we need to make more specific configuration to the DHCP client
-  # than handles the Uplink (WAN) interface because of IPv6. Credit to
-  # KJ and Francis Begyn
-  # (https://francis.begyn.be/blog/ipv6-nixos-router).
-  #
-  # The main purpose here is to assign a IPv6 prefix delegation to the
-  # LAN interface(s), so that together with a router advertisement
-  # service it can provide automatic IPv6 address configuration for
-  # the internal network.
-  networking.dhcpcd = {
-    enable = true;
-
-    # Do not de-configure the interface and configurations when it
-    # exists. I probably do not need persistent based on my
-    # understanding, but I'll just keep it on.
-    persistent = true;
-    allowInterfaces = [ nics.uplink ];
-
-    extraConfig = ''
-      # Don't touch our DNS settings
-      nohook resolv.conf
-
-      # Generate a RFC 4361 complient DHCP ID. This unique identifier
-      # plus the IAID (see below) will be used as client ID.
-      duid
-
-      # The hardware address (i.e. MAC) address will be disguised by a
-      # generated RFC7217 address, so that the actual MAC is not exposed
-      # to the internet.
-      slaac private
-
-      # Do not solicit or accept IPv6 Router Advertisement.
-      noipv6rs
-
-      interface ${nics.uplink}
-        # Enable routing solicitation for Uplink (WAN)
-        ipv6rs
-        # Request an IPv6 address for iaid 1
-        ia_na 1
-        # Request an IPv6 Prefix Delegation (PD) for iaid 2
-        # The prefix length should be 56
-        # The PD is assigned to LAN, with prefix length = 64
-        # The suffix is set to 77 (Hex 4D)
-        # An example IPv6 PD to LAN will look like
-        # 3600:9200:7f7f:a66f::4d/64
-        ia_pd 2//56 ${vlans.home}/0/64/77
-    '';
-  };
-
   services.corerad = {
     enable = true;
     settings = {
@@ -436,36 +445,6 @@ in {
         }
       ];
     };
-  };
-
-  networking.interfaces."${vlans.home}" = {
-    # This is going to be the router's IP to internal devices connects
-    # to it.
-    ipv4.addresses = [ {
-      address = "10.77.1.1";
-      prefixLength = 24;  # Subnet Mask = 255.255.255.0
-    } ];
-    useDHCP = false;
-  };
-
-  networking.interfaces."${vlans.guest}" = {
-    # This is going to be the router's IP to internal devices connects
-    # to it.
-    ipv4.addresses = [ {
-      address = "10.77.100.1";
-      prefixLength = 24;  # Subnet Mask = 255.255.255.0
-    } ];
-    useDHCP = false;
-  };
-
-  networking.interfaces."${vlans.iot}" = {
-    # This is going to be the router's IP to internal devices connects
-    # to it.
-    ipv4.addresses = [ {
-      address = "10.77.104.1";
-      prefixLength = 22;  # Subnet Mask = 255.255.252.0
-    } ];
-    useDHCP = false;
   };
 
   # +------------------+
