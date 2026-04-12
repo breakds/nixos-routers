@@ -171,6 +171,7 @@ in {
       # https://kea.readthedocs.io/en/kea-2.4.1/arm/dhcp4-srv.html#dhcp4-std-options-list
       subnet4 = [
         {
+          id = 1;
           subnet = "10.77.1.0/24";
           interface = vlans.home;
           pools = [ { pool = "10.77.1.20 - 10.77.1.240"; } ];
@@ -243,6 +244,7 @@ in {
         }
 
         {
+          id = 2;
           subnet = "10.77.100.0/24";
           interface = vlans.guest;
           pools = [ { pool = "10.77.100.20 - 10.77.100.240"; } ];
@@ -255,6 +257,7 @@ in {
         }
 
         {
+          id = 3;
           # A lot more IPs to the IoT subnet and therefore the netmask is only 22
           # bits instead of the normal 24 bits.
           subnet = "10.77.104.0/22";
