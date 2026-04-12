@@ -155,22 +155,25 @@ in {
     # Log packets with impossible source addresses for debugging.
     "net.ipv4.conf.all.log_martians" = true;
     "net.ipv4.conf.default.log_martians" = true;
+
+    # Grant unbound the 4 MB socket buffers it requests.
+    "net.core.wmem_max" = 4194304;
+    "net.core.rmem_max" = 4194304;
   };
 
   services.unbound = {
     enable = true;
-    # I think this is important because I may accidently break the unbound
-    # server during debugging or testing new configuration, and this keeps the
-    # router's DNS queries being answered even when unbound is down.
+    # Keep the router's own DNS independent of unbound so that a
+    # broken unbound config doesn't lock us out.
     resolveLocalQueries = false;
     settings = {
       server = {
-        interface = [ "127.0.0.1" "10.77.1.1" "10.77.104.1" ];
+        # Unbound now only serves AdGuard Home on localhost.
+        interface = [ "127.0.0.1" ];
+        port = 5335;
         access-control =  [
           "0.0.0.0/0 refuse"
           "127.0.0.0/8 allow"
-          "10.77.1.0/24 allow"
-          "10.77.104.0/22 allow"
         ];
 	      prefetch = "yes";
 
@@ -211,9 +214,27 @@ in {
     };
   };
 
-  # Open port 53 for downlink DNS request
+  # AdGuard Home: DNS-level ad/tracker blocking in front of unbound.
+  # Clients query AdGuard Home on port 53; non-blocked queries are
+  # forwarded to unbound on localhost:5335 for recursive resolution.
+  services.adguardhome = {
+    enable = true;
+    # Allow managing blocklists and settings via the web UI.
+    mutableSettings = true;
+    settings = {
+      http.address = "10.77.1.1:3000";
+      dns = {
+        bind_hosts = [ "10.77.1.1" "10.77.104.1" ];
+        port = 53;
+        upstream_dns = [ "127.0.0.1:5335" ];
+        bootstrap_dns = [ "8.8.8.8" "1.1.1.1" ];
+      };
+    };
+  };
+
+  # Open port 53 (DNS) and 3000 (AdGuard Home dashboard) for home VLAN.
   networking.firewall.interfaces."${vlans.home}" = {
-    allowedTCPPorts = [ 53 ];
+    allowedTCPPorts = [ 53 3000 ];
     allowedUDPPorts = [ 53 ];
   };
 
@@ -343,8 +364,7 @@ in {
           pools = [ { pool = "10.77.104.20 - 10.77.107.240"; } ];
           option-data = [
             { name = "routers"; data = "10.77.104.1"; }
-            # Add 10.77.104.1 for unbound
-            { name = "domain-name-servers"; data = "10.77.104.1, 1.1.1.1, 8.8.8.8"; }
+            { name = "domain-name-servers"; data = "10.77.104.1"; }
             { name = "broadcast-address"; data = "10.77.107.255"; }
             { name = "subnet-mask"; data = "255.255.252.0"; }
           ];
