@@ -79,7 +79,7 @@
 
     # Modern CLI utilities
     xh fd ripgrep silver-searcher bat
-    lsd duf du-dust btop
+    lsd duf dust btop
   ];
 
   # Graphical Desktop
@@ -90,8 +90,9 @@
       layout = "us";
     };
 
-    desktopManager.gnome.enable = true;
   };
+
+  services.desktopManager.gnome.enable = true;
 
   services.displayManager.gdm = {
     enable = true;
