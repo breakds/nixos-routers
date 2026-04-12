@@ -1,10 +1,7 @@
 { config, lib, pkgs, ... }:
 
 # TODO(breakds)
-# 1. Add mitmproxy
-# 2. networkd
-# 3. Use nftables
-# 4. Filter out martian packets using kernel option rp_filter (https://github.com/ghostbuster91/blogposts/blob/a2374f0039f8cdf4faddeaaa0347661ffc2ec7cf/router2023-part2/main.md)
+# 1. networkd
 
 let nics = rec {
       uplink = "enp2s0";
@@ -298,6 +295,9 @@ in {
     };
   };
 
+  # Use nftables as the firewall backend (unified IPv4/IPv6).
+  networking.nftables.enable = true;
+
   # Firewall
   networking.firewall = {
     enable = true;
@@ -316,28 +316,32 @@ in {
     # ingress interface, which avoids false drops on a multi-VLAN router.
     checkReversePath = "loose";
 
-    # The following is about preventing the outside packet from accessing
-    # internal servers via IPv6. This is done by asking the router to stop
-    # forwarding packets unless they are going outside or coming back w.t.r. an
-    # already established connection.
-    extraCommands = ''
-      ip6tables -P FORWARD DROP
-      ip6tables -A FORWARD -i ${vlans.home} -o ${nics.uplink} -j ACCEPT
-      ip6tables -A FORWARD -i lo -j ACCEPT
-      ip6tables -A FORWARD -o lo -j ACCEPT
-      ip6tables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    # Prevent outside packets from accessing internal servers. The
+    # router will stop forwarding packets unless they are going outside
+    # or coming back as part of an already established connection.
+    # Port-forwarded traffic (e.g. 22/80/443 to octavian) is also
+    # allowed through automatically.
+    #
+    # Technically this sets the FORWARD chain policy to "drop", with
+    # exceptions for conntrack established/related and DNAT traffic
+    # handled by the NixOS nftables module.
+    filterForward = true;
 
-      # RA Guard: Drop rogue IPv6 Router Advertisements (ICMPv6 type 134)
-      # from LAN interfaces. Only the router itself should send RAs.
-      # INPUT rules protect the router; FORWARD rule prevents a rogue RA
-      # on one VLAN from leaking to another via the forwarding path.
-      # For L2 protection of clients on the same VLAN, enable RA guard
-      # on the switch.
-      ip6tables -A INPUT -i ${vlans.home} -p icmpv6 --icmpv6-type 134 -j DROP
-      ip6tables -A INPUT -i ${vlans.guest} -p icmpv6 --icmpv6-type 134 -j DROP
-      ip6tables -A INPUT -i ${vlans.iot} -p icmpv6 --icmpv6-type 134 -j DROP
-      ip6tables -A FORWARD -p icmpv6 --icmpv6-type 134 -j DROP
+    extraForwardRules = ''
+      # Allow home network to reach the internet via IPv6.
+      meta nfproto ipv6 iifname "${vlans.home}" oifname "${nics.uplink}" accept
+
+      # RA Guard: block rogue Router Advertisements from crossing VLANs.
+      icmpv6 type nd-router-advert drop
     '';
+
+    extraInputRules = ''
+      # RA Guard: drop rogue Router Advertisements from LAN interfaces.
+      # Only the router itself should send RAs. For L2 protection of
+      # clients on the same VLAN, enable RA guard on the switch.
+      iifname { "${vlans.home}", "${vlans.guest}", "${vlans.iot}" } icmpv6 type nd-router-advert drop
+    '';
+
     # TODO(breakds): Keep IoT devices from being able to access the
     # main network unless specifically allowed.
   };
@@ -477,7 +481,7 @@ in {
 
   # Other helpful tools
   environment.systemPackages = with pkgs; [
-    tcpdump ethtool
+    tcpdump ethtool dig
   ];
 
   # Avahi for local Multicast DNS
