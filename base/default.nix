@@ -41,6 +41,33 @@
     };
   };
 
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    autosuggestions.enable = true;
+    syntaxHighlighting.enable = true;
+
+    ohMyZsh = {
+      enable = true;
+      theme = "ys";
+      plugins = [ "pass" "dotenv" "extract" "z" ];
+    };
+
+    shellAliases = {
+      ga = "git add";
+      gc = "git commit";
+      gst = "git status";
+    };
+
+    interactiveShellInit = ''
+      export VISUAL='emacs'
+      export EDITOR='emacs'
+
+      # Only accept autosuggestions with end-of-line, not right arrow.
+      ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=(end-of-line)
+    '';
+  };
+
   environment.systemPackages = with pkgs; [
     gparted pass samba emacs
     feh
