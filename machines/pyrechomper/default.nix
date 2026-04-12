@@ -25,13 +25,18 @@
       LC_TIME = "en_US.UTF-8";
     };
 
-    vital.mainUser = "breakds";
-
-    users.users."breakds" = {
+    users.users.breakds = {
+      isNormalUser = true;
+      uid = 1000;
+      home = "/home/breakds";
+      description = "breakds";
+      extraGroups = [ "wheel" "dialout" "uucp" ];
       openssh.authorizedKeys.keyFiles = [
         ../../data/keys/breakds_malenia.pub
       ];
     };
+
+    users.groups.breakds.gid = 1000;
 
     programs.zsh.enable = true;
 

@@ -9,14 +9,37 @@
   # Enable to use non-free packages such as nvidia drivers
   nixpkgs.config.allowUnfree = true;
 
+  # Boot loader
+  boot = {
+    loader.systemd-boot.enable = lib.mkDefault true;
+    loader.efi.canTouchEfiVariables = lib.mkDefault true;
+  };
+
+  # OpenSSH is the primary management path. Tailscale also depends on it
+  # being enabled for remote access over the tailnet.
+  services.openssh.enable = true;
+
+  # Drop udisks2 from the default closure; no interactive mount needs.
+  services.udisks2.enable = lib.mkDefault false;
+
+  nix = {
+    settings = {
+      experimental-features = [ "nix-command" "flakes" ];
+      auto-optimise-store = true;
+    };
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 120d";
+    };
+  };
+
   users.extraUsers = {
     "breakds" = {
       shell = lib.mkDefault pkgs.zsh;
       useDefaultShell = false;
     };
   };
-
-  vital.programs.modern-utils.enable = true;
 
   environment.systemPackages = with pkgs; [
     gparted pass samba emacs
@@ -26,6 +49,10 @@
     scrot
     emacs
     git
+
+    # Modern CLI utilities
+    xh fd ripgrep silver-searcher bat
+    lsd duf du-dust btop
   ];
 
   # Graphical Desktop
