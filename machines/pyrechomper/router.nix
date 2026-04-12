@@ -77,6 +77,10 @@ in {
     "net.ipv4.conf.default.forwarding" = true;
     "net.ipv6.conf.all.forwarding" = true;
     "net.ipv6.conf.default.forwarding" = true;
+
+    # Log packets with impossible source addresses for debugging.
+    "net.ipv4.conf.all.log_martians" = true;
+    "net.ipv4.conf.default.log_martians" = true;
   };
 
   services.unbound = {
@@ -307,8 +311,10 @@ in {
     # Traffic coming in from these interfaces will be accepted unconditionally. Traffic from the
     # loopback (lo) interface will always be accepted.
     trustedInterfaces = [ vlans.home ];
-    # Do not perform reverse path filter test on a packet.
-    checkReversePath = false;
+    # Drop packets with spoofed source addresses. "loose" checks that
+    # some route to the source exists without requiring it to be via the
+    # ingress interface, which avoids false drops on a multi-VLAN router.
+    checkReversePath = "loose";
 
     # The following is about preventing the outside packet from accessing
     # internal servers via IPv6. This is done by asking the router to stop
@@ -323,11 +329,14 @@ in {
 
       # RA Guard: Drop rogue IPv6 Router Advertisements (ICMPv6 type 134)
       # from LAN interfaces. Only the router itself should send RAs.
-      # Note: This protects the router and cross-VLAN forwarding. For L2
-      # protection of clients on the same VLAN, enable RA guard on the switch.
+      # INPUT rules protect the router; FORWARD rule prevents a rogue RA
+      # on one VLAN from leaking to another via the forwarding path.
+      # For L2 protection of clients on the same VLAN, enable RA guard
+      # on the switch.
       ip6tables -A INPUT -i ${vlans.home} -p icmpv6 --icmpv6-type 134 -j DROP
       ip6tables -A INPUT -i ${vlans.guest} -p icmpv6 --icmpv6-type 134 -j DROP
       ip6tables -A INPUT -i ${vlans.iot} -p icmpv6 --icmpv6-type 134 -j DROP
+      ip6tables -A FORWARD -p icmpv6 --icmpv6-type 134 -j DROP
     '';
     # TODO(breakds): Keep IoT devices from being able to access the
     # main network unless specifically allowed.
