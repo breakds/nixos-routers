@@ -39,6 +39,9 @@ in {
   # Use systemd-networkd for declarative network configuration.
   networking.useNetworkd = true;
   networking.useDHCP = false;
+  # Boot is considered online as soon as any one interface is up.
+  # Without this, unused ports with no cable block boot for 2 minutes.
+  systemd.network.wait-online.anyInterface = true;
 
   # VLAN devices on the trunk port (enp3s0).
   systemd.network.netdevs = {
@@ -118,6 +121,16 @@ in {
       matchConfig.Name = vlans.iot;
       address = [ "10.77.104.1/22" ];
       networkConfig.IPv6AcceptRA = false;
+    };
+
+    # Unused NIC (enp5s0): no cable, don't try DHCP, don't block boot.
+    "90-enp5s0" = {
+      matchConfig.Name = "enp5s0";
+      networkConfig = {
+        DHCP = "no";
+        LinkLocalAddressing = "no";
+      };
+      linkConfig.RequiredForOnline = "no";
     };
   };
 
