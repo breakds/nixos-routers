@@ -36,13 +36,6 @@ let nics = rec {
       gree-ac-4 = "10.77.104.35";
     };
 
-    greeAcIps = [
-      ips.gree-ac-1
-      ips.gree-ac-2
-      ips.gree-ac-3
-      ips.gree-ac-4
-    ];
-
     # Script that reads Kea DHCP leases and adds PTR records to
     # unbound so that AdGuard Home can resolve client IPs to hostnames.
     keaUnboundSync = pkgs.writeShellScript "kea-unbound-sync" ''
@@ -483,37 +476,6 @@ in {
   # Use nftables as the firewall backend (unified IPv4/IPv6).
   networking.nftables.enable = true;
 
-  # The sandbox `nft -c` check doesn't know about our VLAN netdevs,
-  # so references to "home90" / "iot104" in the gree_relay netdev
-  # chain fail to resolve. Rewrite both to "lo" (which always exists
-  # in the sandbox) just for the syntax check; the real ruleset
-  # applied at runtime is unmodified.
-  networking.nftables.preCheckRuleset = ''
-    sed -i \
-      -e 's/device "${vlans.home}"/device "lo"/g' \
-      -e 's/dup to "${vlans.iot}"/dup to "lo"/g' \
-      ruleset.conf
-  '';
-
-  # Gree mini-split AC discovery relay.
-  #
-  # Home Assistant (on octavian, VLAN home) discovers Gree ACs by
-  # UDP broadcasting {"t":"scan"} to port 7000. The ACs live in VLAN
-  # iot, so the broadcast normally never reaches them. This netdev
-  # ingress chain matches the discovery broadcast and dup's it out
-  # the iot VLAN interface, preserving the original source IP so the
-  # ACs reply unicast directly back to Home Assistant. Replies are
-  # accepted by the forward rule above.
-  networking.nftables.tables.gree_relay = {
-    family = "netdev";
-    content = ''
-      chain home_to_iot {
-        type filter hook ingress device "${vlans.home}" priority -500;
-        ip saddr ${ips.octavian-10g} udp dport 7000 pkttype broadcast counter dup to "${vlans.iot}"
-      }
-    '';
-  };
-
   # Firewall
   networking.firewall = {
     enable = true;
@@ -549,12 +511,6 @@ in {
       # Allow home network to manage IoT devices (cameras, ratgdo, etc.).
       # Return traffic is handled by conntrack (established/related).
       iifname "${vlans.home}" oifname "${vlans.iot}" accept
-
-      # Gree AC discovery replies: the outbound broadcast is duplicated
-      # into VLAN iot by the gree_relay netdev chain, which doesn't go
-      # through conntrack, so the unicast reply from each AC (UDP src
-      # port 7000) needs an explicit forward rule back to home.
-      iifname "${vlans.iot}" oifname "${vlans.home}" ip saddr { ${lib.concatStringsSep ", " greeAcIps} } udp sport 7000 counter accept
 
       # RA Guard: block rogue Router Advertisements from crossing VLANs.
       icmpv6 type nd-router-advert drop
