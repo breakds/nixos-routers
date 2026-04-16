@@ -509,7 +509,7 @@ in {
     content = ''
       chain home_to_iot {
         type filter hook ingress device "${vlans.home}" priority -500;
-        ip saddr ${ips.octavian-10g} udp dport 7000 pkttype broadcast dup to "${vlans.iot}"
+        ip saddr ${ips.octavian-10g} udp dport 7000 pkttype broadcast counter dup to "${vlans.iot}"
       }
     '';
   };
@@ -554,7 +554,7 @@ in {
       # into VLAN iot by the gree_relay netdev chain, which doesn't go
       # through conntrack, so the unicast reply from each AC (UDP src
       # port 7000) needs an explicit forward rule back to home.
-      iifname "${vlans.iot}" oifname "${vlans.home}" ip saddr { ${lib.concatStringsSep ", " greeAcIps} } udp sport 7000 accept
+      iifname "${vlans.iot}" oifname "${vlans.home}" ip saddr { ${lib.concatStringsSep ", " greeAcIps} } udp sport 7000 counter accept
 
       # RA Guard: block rogue Router Advertisements from crossing VLANs.
       icmpv6 type nd-router-advert drop
