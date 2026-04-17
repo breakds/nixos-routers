@@ -512,6 +512,9 @@ in {
       # Return traffic is handled by conntrack (established/related).
       iifname "${vlans.home}" oifname "${vlans.iot}" accept
 
+      # Tailscale exit node: allow tailnet clients to reach the internet.
+      iifname "tailscale0" oifname "${nics.uplink}" accept
+
       # RA Guard: block rogue Router Advertisements from crossing VLANs.
       icmpv6 type nd-router-advert drop
     '';
@@ -530,8 +533,8 @@ in {
     enable = true;
     enableIPv6 = false;
     externalInterface = nics.uplink;
-    internalInterfaces = [ vlans.home vlans.guest vlans.iot ];
-    internalIPs = [ "10.77.1.0/24" "10.77.100.0/24" "10.77.104.0/22" ];
+    internalInterfaces = [ vlans.home vlans.guest vlans.iot "tailscale0" ];
+    internalIPs = [ "10.77.1.0/24" "10.77.100.0/24" "10.77.104.0/22" "100.64.0.0/10" ];
     forwardPorts = [
       { sourcePort = 22; destination = "${ips.octavian-10g}:22"; loopbackIPs = [ "23.119.127.221" ]; }
       { sourcePort = 80; destination = "${ips.octavian-10g}:80"; loopbackIPs = [ "23.119.127.221" ]; }
