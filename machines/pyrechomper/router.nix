@@ -595,7 +595,7 @@ in {
 
   # Other helpful tools
   environment.systemPackages = with pkgs; [
-    tcpdump ethtool dig
+    tcpdump ethtool dig iptables
   ];
 
   # Avahi for local Multicast DNS
