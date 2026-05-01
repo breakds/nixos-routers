@@ -6,6 +6,7 @@
     ./router.nix
     ../../base
     ../../base/tailscale.nix
+    ../../base/harden.nix
   ];
 
   config = {
