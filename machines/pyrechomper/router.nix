@@ -17,6 +17,11 @@ let nics = rec {
       iot = "iot${toString vlanIds.iot}";
     };
 
+    # RFC 4193 ULA prefix for routable local IPv6 across VLANs.
+    # Matter needs IPv6 beyond link-local when controllers and devices
+    # live on different L3 segments.
+    ulaPrefix = "fd85:6432:2320";
+
     ips = {
       limbius = "10.77.1.193";
       octavian-10g = "10.77.1.131";
@@ -130,7 +135,10 @@ in {
     # delegated prefix so devices can auto-configure IPv6 addresses.
     "30-${vlans.home}" = {
       matchConfig.Name = vlans.home;
-      address = [ "10.77.1.1/24" ];
+      address = [
+        "10.77.1.1/24"
+        "${ulaPrefix}:1::1/64"
+      ];
       networkConfig = {
         DHCPPrefixDelegation = true;
         IPv6AcceptRA = false;
@@ -155,7 +163,10 @@ in {
     # IoT VLAN: limited access, /22 for more address space.
     "30-${vlans.iot}" = {
       matchConfig.Name = vlans.iot;
-      address = [ "10.77.104.1/22" ];
+      address = [
+        "10.77.104.1/22"
+        "${ulaPrefix}:104::1/64"
+      ];
       networkConfig.IPv6AcceptRA = false;
     };
 
@@ -559,6 +570,14 @@ in {
           advertise = true;
           prefix = [
             { prefix = "::/64"; }
+            { prefix = "${ulaPrefix}:1::/64"; }
+          ];
+        }
+        {
+          name = vlans.iot;
+          advertise = true;
+          prefix = [
+            { prefix = "${ulaPrefix}:104::/64"; }
           ];
         }
       ];
