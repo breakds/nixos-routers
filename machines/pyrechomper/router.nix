@@ -528,6 +528,10 @@ in {
 
       # RA Guard: block rogue Router Advertisements from crossing VLANs.
       icmpv6 type nd-router-advert drop
+
+      # Allow approved tailnet users to reach the trusted home LAN.
+      # User-level authorization is enforced by Tailscale ACLs.
+      iifname "tailscale0" oifname "${vlans.home}" ip daddr 10.77.1.0/24 accept
     '';
 
     extraInputRules = ''

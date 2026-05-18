@@ -5,7 +5,7 @@
     services.tailscale = {
       enable = true;
       port = 41661;  # The default is 41641.
-      useRoutingFeatures = "server";      
+      useRoutingFeatures = "server";
     };
 
     networking.firewall = {
