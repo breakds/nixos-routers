@@ -326,6 +326,13 @@ in {
       # The interfaces to be used by the server.
       interfaces-config = {
         interfaces = [ vlans.home vlans.guest vlans.iot ];
+        # The VLAN interfaces live on the enp3s0 trunk and their carrier
+        # can come up after kea starts (network-online.target fires on the
+        # WAN link first, see wait-online.anyInterface above). Without
+        # retries kea gives up after one attempt, opens no sockets, and
+        # stays deaf to DHCP until the next restart. Retry instead.
+        service-sockets-max-retries = 20;
+        service-sockets-retry-wait-time = 5000;  # ms -> ~100s of retries
       };
 
       lease-database = {
