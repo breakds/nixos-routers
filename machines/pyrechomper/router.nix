@@ -39,6 +39,7 @@ let nics = rec {
       gree-ac-2 = "10.77.104.34";
       gree-ac-3 = "10.77.104.37";
       gree-ac-4 = "10.77.104.35";
+      reolink-catcam-living-room = "10.77.104.39";
     };
 
     # Script that reads Kea DHCP leases and adds PTR records to
@@ -484,6 +485,12 @@ in {
               hw-address = "58:0d:0d:fa:df:40";
               ip-address = ips.gree-ac-4;
               hostname = "gree-ac-4";
+            }
+
+            {
+              hw-address = "7c:01:3e:81:2e:38";
+              ip-address = ips.reolink-catcam-living-room;
+              hostname = "reolink-catcam-living-room";
             }
           ];
         }
