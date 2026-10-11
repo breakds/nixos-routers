@@ -29,6 +29,7 @@ let nics = rec {
       forgery = "10.77.1.136";
       cradle = "10.77.1.56";
       brock = "10.77.1.45"; # The bottom-right port
+      bolter = "10.77.1.157";
       shelly-garage-door = "10.77.1.63";  # The Shelly 1 Gen 4 on Garage Door (deprecated)
       solar-pi = "10.77.1.52";
       shelly-office-light = "10.77.1.44";
@@ -411,6 +412,11 @@ in {
               hw-address = "00:90:27:f7:39:76";
               ip-address = ips.brock;
               hostname = "brock"; }
+
+            {
+              hw-address = "58:47:ca:73:5e:75";
+              ip-address = ips.bolter;
+              hostname = "bolter"; }
 
             {
               hw-address = "cc:ba:97:c8:3f:68";
