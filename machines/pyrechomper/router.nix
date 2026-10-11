@@ -324,6 +324,17 @@ in {
       renew-timer = 302400;   # 50.0% of the valid-lifetime.
       rebind-timer = 529200;  # 87.5% of the valid-lifetime.
 
+      # iVentoy in ExternalNet mode: only home-LAN x86-64 UEFI PXE
+      # clients receive boot instructions. Ordinary DHCP stays unchanged.
+      client-classes = [
+        {
+          name = "home-uefi-pxe";
+          test = "pkt.iface == '${vlans.home}' and substring(option[60].text, 0, 9) == 'PXEClient' and (option[93].hex == 0x0007 or option[93].hex == 0x0009)";
+          next-server = ips.octavian-10g;
+          boot-file-name = "iventoy_loader_16000_uefi";
+        }
+      ];
+
       # The interfaces to be used by the server.
       interfaces-config = {
         interfaces = [ vlans.home vlans.guest vlans.iot ];
