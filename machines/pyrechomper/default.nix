@@ -4,6 +4,7 @@
   imports = [
     ./hardware-configuration.nix
     ./router.nix
+    ./power-cycle.nix
     ../../base
     ../../base/tailscale.nix
     ../../base/harden.nix

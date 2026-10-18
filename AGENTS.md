@@ -39,6 +39,6 @@ sudo rtcwake -m no -s 20 && sudo systemctl poweroff
 | Next crash at            | Means                                                                       |
 |--------------------------|-----------------------------------------------------------------------------|
 | 2026-12-01 ~07:41 PST    | The power-off didn't reset the counter. Cut AC power with a smart plug.     |
-| 2026-12-06 ~23:54 PST    | It did. Power-cycle with `rtcwake` from a timer on the 1st and 15th.        |
+| 2026-12-06 ~23:54 PST    | It did. Keep `power-cycle.nix`.                                              |
 
-Avoid other power-offs and reboots until then, or note them here.
+`machines/pyrechomper/power-cycle.nix` repeats this power-cycle at 04:00 on the 1st and 15th. If power-offs reset the counter, those runs head off both crashes, so no crash by Dec 6 also means it works. Note any other power-offs or reboots here.
