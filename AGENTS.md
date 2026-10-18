@@ -21,3 +21,24 @@ journalctl -b -1 -n 1 -o short-monotonic
 ```
 
 A value near a multiple of 4294967 means this issue.
+
+### The counter survives reboots
+
+The crash comes 0–60 s after 2^32 ms counted from the last real power-on, not from the last boot. Warm reboots and clean power-offs (boot -3 on 2026-08-23) did not reset it. So the counter likely lives in standby-powered firmware (EC or Intel ME). A scheduled `systemctl reboot` won't help.
+
+### Experiment: does a power-off with RTC wake reset it?
+
+On 2026-10-18 07:50 PDT the router was powered off and woken by the RTC:
+
+```sh
+sudo rtcwake -m no -s 20 && sudo systemctl poweroff
+```
+
+(`rtcwake -m off` calls `/sbin/shutdown`, which NixOS lacks.) Power-off took 2 s, and the router came back without help.
+
+| Next crash at            | Means                                                                       |
+|--------------------------|-----------------------------------------------------------------------------|
+| 2026-12-01 ~07:41 PST    | The power-off didn't reset the counter. Cut AC power with a smart plug.     |
+| 2026-12-06 ~23:54 PST    | It did. Power-cycle with `rtcwake` from a timer on the 1st and 15th.        |
+
+Avoid other power-offs and reboots until then, or note them here.
