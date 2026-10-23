@@ -4,6 +4,8 @@
 { config, lib, pkgs, ... }:
 
 {
+  imports = [ ./security-patches.nix ];
+
   time.timeZone = lib.mkDefault "America/Los_Angeles";
 
   # Enable to use non-free packages such as nvidia drivers
