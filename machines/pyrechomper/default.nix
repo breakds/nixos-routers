@@ -45,6 +45,9 @@
       hostId = "c607c8de";
     };
 
+    # Allow remote deployments to copy locally built, unsigned store paths.
+    nix.settings.trusted-users = [ "breakds" ];
+
     # Sound (pipewire)
     services.pulseaudio.enable = false;
     security.rtkit.enable = true;
