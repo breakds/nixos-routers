@@ -33,6 +33,7 @@ let nics = rec {
       shelly-garage-door = "10.77.1.63";  # The Shelly 1 Gen 4 on Garage Door (deprecated)
       solar-pi = "10.77.1.52";
       shelly-office-light = "10.77.1.44";
+      bambu-x1c = "10.77.1.66";
       aqara-g5-porch = "10.77.104.27";
       aqara-g5-deck = "10.77.104.29";
       ratgdo = "10.77.104.38";
@@ -430,6 +431,12 @@ in {
             {
               hw-address = "28:37:2f:2a:4c:60";
               ip-address = ips.shelly-office-light;
+            }
+
+            {
+              hw-address = "9c:b8:b4:69:dd:70";
+              ip-address = ips.bambu-x1c;
+              hostname = "bambu-x1c";
             }
           ];
         }
