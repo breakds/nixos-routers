@@ -42,3 +42,28 @@ sudo rtcwake -m no -s 20 && sudo systemctl poweroff
 | 2026-12-06 ~23:54 PST    | It did. Keep `power-cycle.nix`.                                              |
 
 `machines/pyrechomper/power-cycle.nix` repeats this power-cycle at 04:00 on the 1st and 15th. If power-offs reset the counter, those runs head off both crashes, so no crash by Dec 6 also means it works. Note any other power-offs or reboots here.
+
+### 2026-11-15: scheduled shutdowns failed to wake
+
+Both runs armed `/dev/rtc0` successfully and shut down in about 2 s:
+
+| Date (PST) | Alarm set | Wake due | Journal ended | Next boot |
+|------------|-----------|----------|---------------|-----------|
+| Nov 1      | 04:00:27  | 04:02:28 | 04:00:29      | 07:13:13  |
+| Nov 15     | 04:00:02  | 04:02:03 | 04:00:04      | 07:56:59  |
+
+The October 18 test used Linux 7.0.2, where `rtc_cmos` was `rtc0`.
+After the October 22 upgrade to Linux 7.3.0, `acpi-tad` registered as
+`rtc0` and CMOS moved to `rtc1`. The service still used rtcwake's default
+`rtc0`. ACPI TAD reports capabilities `0xB7`, which lacks both AC and DC
+S5 wake bits (6 and 8 in `drivers/acpi/acpi_tad.c`). This explains why
+setting the alarm succeeded without powering the router back on.
+
+The fix selects the RTC by its sysfs name (`rtc_cmos rtc_cmos`) and
+aborts if it cannot find it or arm its alarm. A supervised power-off/wake
+test on the current kernel is still needed; selecting CMOS alone does
+not prove S5 wake works on this kernel. Do not run that test unattended.
+
+The extra shutdowns and recoveries also confound the original December
+predictions. Record whether recovery involved removing AC power before
+drawing conclusions about the 49.7-day counter.
