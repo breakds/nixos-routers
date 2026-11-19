@@ -245,6 +245,7 @@ in {
         local-data = [
           "\"temporal.breakds.net. 3600 IN A ${ips.octavian-10g}\""
           "\"home.breakds.net. 3600 IN A ${ips.octavian-10g}\""
+          "\"files-admin.breakds.net. 3600 IN A ${ips.octavian-10g}\""
         ];
       };
 
