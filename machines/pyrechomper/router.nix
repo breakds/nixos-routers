@@ -26,8 +26,7 @@ let nics = rec {
       limbius = "10.77.1.193";
       octavian-10g = "10.77.1.131";
       radahn = "10.77.1.35";  # The upper ethernet port
-      forgery = "10.77.1.136";
-      cradle = "10.77.1.56";
+      cradle = "10.77.1.136";
       brock = "10.77.1.45"; # The bottom-right port
       bolter = "10.77.1.157";
       shelly-garage-door = "10.77.1.63";  # The Shelly 1 Gen 4 on Garage Door (deprecated)
@@ -401,11 +400,6 @@ in {
 
             {
               hw-address = "1c:69:7a:03:9c:1a";
-              ip-address = ips.forgery;
-              hostname = "forgery"; }
-
-            {
-              hw-address = "58:47:ca:70:51:ae";
               ip-address = ips.cradle;
               hostname = "cradle"; }
 
