@@ -1,5 +1,10 @@
 { config, pkgs, ... }:
 
+let
+  sshHostKeys = [
+    { type = "ed25519"; path = "/etc/ssh/ssh_host_ed25519_key"; }
+  ];
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -11,6 +16,7 @@
   ];
 
   config = {
+    services.openssh.hostKeys = sshHostKeys;
     boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
     # Select internationalisation properties.
@@ -81,6 +87,7 @@
 
         services.openssh = {
           enable = true;
+          hostKeys = sshHostKeys;
           settings = {
             PermitRootLogin = "no";
             PasswordAuthentication = false;
