@@ -1,10 +1,3 @@
-{ config, pkgs, ... }:
-
-let
-  sshHostKeys = [
-    { type = "ed25519"; path = "/etc/ssh/ssh_host_ed25519_key"; }
-  ];
-in
 {
   imports = [
     ./hardware-configuration.nix
@@ -16,7 +9,9 @@ in
   ];
 
   config = {
-    services.openssh.hostKeys = sshHostKeys;
+    services.openssh.hostKeys = [
+      { type = "ed25519"; path = "/etc/ssh/ssh_host_ed25519_key"; }
+    ];
     boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
     # Select internationalisation properties.
@@ -62,52 +57,6 @@ in
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
-    };
-
-    # A container for VPN and other stuff
-    containers.limbius = {
-      autoStart = true;
-      privateNetwork = true;
-      # Steal host's physical interface ETH3 (enp4s0).
-      interfaces = [ "enp4s0" ];
-      enableTun = true;
-
-      config = { config, pkgs, ... }: {
-        networking.interfaces.enp4s0.useDHCP = true;
-
-        users.users.breakds = {
-          isNormalUser = true;
-          home = "/home/breakds";
-          extraGroups = [ "wheel" ];
-          createHome = true;
-          openssh.authorizedKeys.keyFiles = [
-            ../../data/keys/breakds_malenia.pub
-          ];
-        };
-
-        services.openssh = {
-          enable = true;
-          hostKeys = sshHostKeys;
-          settings = {
-            PermitRootLogin = "no";
-            PasswordAuthentication = false;
-          };
-        };
-
-        environment.systemPackages = with pkgs; [
-          emacs git pass openconnect tmux
-        ];
-
-        # Allow sudo without password
-        security.sudo.extraRules = [
-          {
-            users = [ "breakds" ];
-            commands = [ { command = "ALL"; options = [ "NOPASSWD" ];} ];
-          }
-        ];
-
-        system.stateVersion = "22.11";
-      };
     };
 
     # Router specific

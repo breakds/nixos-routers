@@ -23,7 +23,6 @@ let nics = rec {
     ulaPrefix = "fd85:6432:2320";
 
     ips = {
-      limbius = "10.77.1.193";
       octavian-10g = "10.77.1.131";
       radahn = "10.77.1.35";  # The upper ethernet port
       cradle = "10.77.1.136";
@@ -169,6 +168,12 @@ in {
         "${ulaPrefix}:104::1/64"
       ];
       networkConfig.IPv6AcceptRA = false;
+    };
+
+    # ETH3 is cabled to the home LAN. Keep the spare port down.
+    "90-enp4s0" = {
+      matchConfig.Name = "enp4s0";
+      linkConfig.ActivationPolicy = "always-down";
     };
 
     # Unused NIC (enp5s0): no cable, don't try DHCP, don't block boot.
@@ -392,11 +397,6 @@ in {
             { hw-address = "a0:36:bc:bb:4f:8e";
               ip-address = "10.77.1.185";
               hostname = "malenia"; }
-
-            {
-              hw-address = "7c:2b:e1:13:8c:8d";  # ETH3 of this router (enp4s0)
-              ip-address = ips.limbius;
-              hostname = "limbius"; }
 
             {
               hw-address = "1c:69:7a:03:9c:1a";
